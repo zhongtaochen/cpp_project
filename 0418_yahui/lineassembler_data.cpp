@@ -94,7 +94,7 @@ const vector<string> LineAssembler::REG_BIN =
      "$k1",   "$gp", "$sp", "$fp", "$ra"
 };
 
-const vector<string> LineAssembler::Pseudo_Bin =
+const map<string,Format> LineAssembler::Pseudo_Bin =
 {
 //    {"mul", {RDEST,RSRC1,SRC2}},
 //    {"abs", {RDEST,RSRC}},
@@ -119,4 +119,6 @@ const vector<string> LineAssembler::Pseudo_Bin =
     //写到P58 课本 58页还有几个没写//
     /////// 没写完
 };
+
+
 
