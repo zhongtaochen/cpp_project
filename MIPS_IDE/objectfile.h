@@ -1,7 +1,7 @@
 /**
  * @file objectfile.h
  * @brief <code>ObjectFile</code> class, <code>TextCell</code> struct,
- * <code>DataCell</code> struct, <code>RelocationCell</code> struct
+ * <code>DataCell</code> struct, <code>RelocationCell</code> struct.
  * @details This file exports an <code>ObjectFile</code> class and several
  * neccessary structs. The design adapts from the descriptions in Patterson
  * and Henessy's book section 2.12.
@@ -21,7 +21,7 @@
  */
 struct TextCell{
     uint32_t address;
-    int32_t machine_code;
+    uint32_t machine_code;
     std::string instruction;
 };
 
@@ -31,7 +31,7 @@ struct TextCell{
  */
 struct DataCell{
     uint32_t address;
-    int32_t data;
+    uint32_t data;
 };
 
 /**

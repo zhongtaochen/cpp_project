@@ -1,6 +1,6 @@
 /**
  * @file executablefile.h
- * @brief <code>ExecutableFile</code> class
+ * @brief <code>ExecutableFile</code> class.
  * @details This file exports an <code>ExecutableFile</code> class,
  * adapting from the descriptions in Patterson and Henessy's book section 2.12.
  */
