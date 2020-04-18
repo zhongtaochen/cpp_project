@@ -55,7 +55,17 @@ private:
 // 把 var_name 和 addrss of this variable 存储在symbol table里
 // 这个function 之后应按需要 改动 ，现在只是曲这样想的
 // 但这样子写 其实没有做到 词法分析？？ 和 czt之前写的没有什么区别
+//   看这个链接 https://stackoverflow.com/questions/19608845/understanding-assembly-mips-align-and-memory-addressing
 
+
+/**
+* Method: handle_ARCII()
+* Usage: handle_ARCII(line);
+* ---------------------------------------
+* @brief Handle ".arcII" and write word or byte in dataseg of objFile.
+* 看这个链接 https://stackoverflow.com/questions/19608845/understanding-assembly-mips-align-and-memory-addressing
+*/
+    void handle_ARCII(std::string line);
 
 /**
 * Method: handle_word()
