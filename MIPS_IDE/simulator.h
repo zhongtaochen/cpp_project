@@ -11,9 +11,12 @@
 #define SIMULATOR_H
 
 #include <cstdint>
+#include "executor.h"
 
 /**
- * @brief Simulates behaviors of memory.
+ * @brief Simulate behaviors of memory.
+ * @details Encapsulate an <code>uint8_t</code> array, wherein each element
+ * simulates one-byte data in the memory. Big-edian machine assumed.
  */
 class MemorySimulator{
 
@@ -28,6 +31,12 @@ public:
  */
 
     MemorySimulator(unsigned int num_of_bytes = 0x00a00000);
+
+/**
+ * @brief Destructor for <code>MemorySimulator</code> class. Invoked implicitly usually.
+ */
+
+    ~MemorySimulator();
 
 /**
  * @brief Write single-byte data to to given address.
@@ -74,7 +83,24 @@ public:
 
     uint32_t readWord(uint32_t address);
 
+/**
+ * @brief Return the end address of the simulated memory.
+ */
+
+    uint32_t getEndAddress();
+
 private:
+
+    uint8_t* mem_arr;
+    uint32_t __end_address;
+
+/**
+ * @brief Calculate corrresponding simulated block index given <code>address</code>.
+ * @warning Abort if <code>address</code> is out of bound.
+ */
+
+    unsigned int toIndex(uint32_t address);
+
 };
 
 /**
@@ -115,35 +141,38 @@ public:
 
 private:
     uint32_t register_files[34];
+
+/**
+ * @brief Check given <code>id</code> is valid or not.
+ * @warning Abort if <code>id</code> is out of bound.
+ */
+
+    void checkValid(unsigned int id);
 };
 
 
 /**
- * @brief Simulates behaviors of the processor.
+ * @brief Simulate behaviors of the processor. Subclass of <code>Executor</code>.
  */
-class Simulator {
+class Simulator : Executor {
 
 public:
 
 /**
  * @brief Initializer for <code>Simulator</code> class.
- * @param mem_sim Memory simulator to be loaded.
- * @param reg_sim Register files simulator to be loaded.
+ * @param mem Memory simulator to be loaded.
+ * @param reg Register files simulator to be loaded.
  */
 
-    Simulator(MemorySimulator mem_sim, RegisterFilesSimulator reg_sim);
+    Simulator(MemorySimulator* mem, RegisterFilesSimulator* reg);
 
 /**
- * @brief Excutes MIPS instructions stored in the text section.
+ * @brief Run MIPS instructions stored in the text section until the program exits.
  * @details Text section in the memory starts from the <code>__start_address</code>
  * defined in <code>MemorySimulator</code> class.
  */
 
-    void simulate();
-
-private:
-    MemorySimulator mem_sim;
-    RegisterFilesSimulator reg_sim;
+    void run();
 };
 
 #endif // SIMULATOR_H

@@ -35,7 +35,7 @@ struct DataCell{
 };
 
 /**
- * @brief Basic unit for relocation information both <code>ObjectFile</code>.
+ * @brief Basic unit for relocation information in <code>ObjectFile</code>.
  */
 struct RelocationCell{
     uint32_t address;
