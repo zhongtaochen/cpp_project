@@ -9,6 +9,8 @@
 #define EXECUTOR_H
 
 #include <cstdint>
+#include <vector>
+#include <string>
 
 class MemorySimulator;
 class RegisterFilesSimulator;
@@ -33,15 +35,28 @@ public:
     uint32_t execute(uint32_t instruction);
 
 protected:
+
 /**
  * @brief Protected void constructor for <code>Executor</code> class.
  * @details Prohibit initialization by clients.
  */
+
     Executor(){};
+
+/**
+ * @brief Operating system–like services followint SPIM.
+ * @details Floating-point-processor services are ommitted.
+ * Notice that UNIX library calls like <code>open</code> are not dealt elegantly,
+ * but rather are dealt with C++ file stream library. The implementation may be a
+ * little awkward considering this aspect.
+ */
+
+    void syscall();
 
     MemorySimulator* mem;
     RegisterFilesSimulator* reg;
     uint32_t pc;
+    std::vector<std::string> files_record;
 };
 
 

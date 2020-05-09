@@ -56,7 +56,7 @@ void testRegisterFilesSimulator() {
 
 /**
  * @brief Simple unit tests for <code>Simulator</code> class.
- * @details Cover
+ * @details Cover core methods. Implementation passed the tests.
  */
 void testSimulator() {
     MemorySimulator mem(8);
