@@ -42,7 +42,7 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
                     ExecutableFile::segment_cell cell = exe_file.text_segment.at(sum>>2);
                     string mc_code  = cell.data;
 
-                    unsigned int mc_code_int = stoi(mc_code, 0, 2);
+                    unsigned int mc_code_int = stoul(mc_code, 0, 2);
                     if (reloc.instuction == "j" || reloc.instuction == "jal") { // J-type
                         mc_code_int &= 0xfc000000;
                         mc_code_int |= ((symbol_table.at(reloc.dependency) &= ~0xf0000000) >> 2);
