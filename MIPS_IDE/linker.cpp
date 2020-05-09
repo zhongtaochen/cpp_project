@@ -28,9 +28,9 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
             }
             for (ObjectFile::segment_cell cell : obj_file.data_segment) {
                 unsigned int absolute_addr = cell.address + curr_data_addr;
-                exe_file.data_segment.push_back({absolute_addr, cell.data});
-                exe_file.data_size += 4;
+                exe_file.data_segment.push_back({absolute_addr, cell.data});                
             }
+            exe_file.data_size += obj_file.data_size;
 
         }
         unsigned int start_text_locat = 0;
@@ -42,7 +42,7 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
                     ExecutableFile::segment_cell cell = exe_file.text_segment.at(sum>>2);
                     string mc_code  = cell.data;
 
-                    unsigned int mc_code_int = stoi(mc_code, 0, 2);
+                    unsigned int mc_code_int = stoul(mc_code, 0, 2);
                     if (reloc.instuction == "j" || reloc.instuction == "jal") { // J-type
                         mc_code_int &= 0xfc000000;
                         mc_code_int |= ((symbol_table.at(reloc.dependency) &= ~0xf0000000) >> 2);
@@ -51,6 +51,7 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
                         //static const unsigned int __data_addr = 0x00500000;
                         string addrs_diff = intToHexString(symbol_table.at(reloc.dependency)-exe_file.__data_addr);//offset w.r.t $gp
                         unsigned int addrs_diff_int  = std::stoul(addrs_diff,nullptr,16);
+                        
                         mc_code_int |= 0x0000ffff&addrs_diff_int;
                     }
                     exe_file.text_segment.at(sum>> 2).data = intToBinaryString(mc_code_int);
