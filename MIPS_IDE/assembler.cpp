@@ -29,6 +29,7 @@ void Assembler::handleDataSection(const string &asm_data_sec) {
 //        cout << intToHexString(obj_file.data_size) << endl;
         vector<string> tokens = split(line, "[ \t]+");
         string type = tokens.at(1);
+        string data_name = line.substr(0,line.find(":"));
         if (type == ".asciiz") {
             string str = line.substr(line.find("\"")+1, line.rfind("\"")-line.find("\"")-1);
             str = str + "\0";
@@ -47,22 +48,78 @@ void Assembler::handleDataSection(const string &asm_data_sec) {
                 obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(word)});
                 obj_file.data_size += 4;
             }
-        } else if (type == ".word") {
-            string data_name = line.substr(0,line.find(":"));
+
+
+
+        }
+        else if (type == ".ascii") {
+            string str = line.substr(line.find("\"")+1, line.rfind("\"")-line.find("\"")-1);
+            // str = str + "\0";            ".ascii"的唯一区别是字符串末尾不加入终止符
+            unsigned int word = 0;
+            unsigned int i = 0;
+            for (; i < str.size(); i++) {
+                char ch = str.at(i);           //i作为序号去遍历索引str中的各字符，每个char 8个bits（单字节
+                word |= (ch << ((3 - (i % 4)) << 3)); //ch 进行位移操作
+                if (i % 4 == 3) {                   //每4个字节换行一次
+                    obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(word)});
+                    obj_file.data_size += 4;        //data_size即是地址
+                    word = 0;
+                }
+            }
+            if (str.size() % 4 != 0) {
+                obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(word)});
+                obj_file.data_size += 4;
+            }
+
+
+
+        }else if (type == ".word") {
             string data = line.substr(line.find(".word")+5);
             trim(data);
             vector<string> elements = split(data, "[ \t,]+");
+            obj_file.symbol_table.insert({"*"+data_name,obj_file.data_size});
             for (string element : elements) {
                 obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(stoi(element))});
-                //下面这行加入到symbol table 是曲雅慧后来写的，
-                obj_file.symbol_table.insert({"*"+data_name,obj_file.data_size});
                 obj_file.data_size += 4;
+            }
+        }else if (type == ".half") {
+            string data = line.substr(line.find(".word")+5);
+            trim(data);
+            vector<string> elements = split(data, "[ \t,]+");
+            obj_file.symbol_table.insert({"*"+data_name,obj_file.data_size});
+            for (string element : elements) {
+                obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(stoi(element))});
+                obj_file.data_size += 2;
+            }
+            while (obj_file.data_size %4 != 3){
+                obj_file.data_segment.push_back({obj_file.data_size, 0000000000000000});
+                obj_file.data_size += 2;
+            }
+        }else if (type == ".byte") {
+            string data = line.substr(line.find(".word")+5);
+            trim(data);
+            vector<string> elements = split(data, "[ \t,]+");
+            obj_file.symbol_table.insert({"*"+data_name,obj_file.data_size});
+            for (string element : elements) {
+                obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(stoi(element))});
+                obj_file.data_size += 1;
+            }
+            while (obj_file.data_size %4 != 3){
+                obj_file.data_segment.push_back({obj_file.data_size, 00000000});
+                obj_file.data_size += 1;
+            }
 
+        }else if (type == ".space") {
+            string data = line.substr(line.find(".space")+6);
+            trim(data);
+            obj_file.symbol_table.insert({"*"+data_name,obj_file.data_size});
+            for(int i=0;i < stoi(data); i++){
+                obj_file.data_segment.push_back({obj_file.data_size, 00000000000000000000000000000000});
+                obj_file.data_size += 4;
             }
         }
     }
 }
-
 void Assembler::handleTextSection(const string &asm_text_sec) {
     preprocess(asm_text_sec);
     obj_file.text_size = asm_lines.size() << 2;
