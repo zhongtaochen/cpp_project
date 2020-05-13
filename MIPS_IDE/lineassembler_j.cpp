@@ -15,7 +15,7 @@ ObjectFile J_LineAssembler::assemble() {
     int machine_code_int = 0;
     machine_code_int |= (op << 26);
     machine_code_int |= target;
-    obj_file.text_segment.at(address >> 2).data = intToBinaryString(machine_code_int);
+    obj_file.text_segment.at(address >> 2).machine_code = machine_code_int;
     return obj_file;
 }
 
@@ -39,7 +39,7 @@ void J_LineAssembler::handleOperand(OperandType op_type, const string &op) {
             tokens = split(asm_line, "[ \t,]+");
             instruction = tokens.at(0);
             if(target!=0){
-                obj_file.relocation_info.push_back({address, instruction, op});
+                obj_file.relocation_information.push_back({address, instruction, op});
             }
 
             break;

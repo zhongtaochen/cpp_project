@@ -18,7 +18,7 @@ ObjectFile R_LineAssembler::assemble() {
     machine_code_int |= (rd << 11);
     machine_code_int |= (sa << 6);
     machine_code_int |= fn;
-    obj_file.text_segment.at(address >> 2).data = intToBinaryString(machine_code_int);
+    obj_file.text_segment.at(address >> 2).machine_code = machine_code_int;
     return obj_file;
 }
 

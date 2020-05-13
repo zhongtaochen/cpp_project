@@ -18,7 +18,7 @@ ObjectFile I_LineAssembler::assemble() {
     machine_code_int |= (rs << 21);
     machine_code_int |= (rt << 16);
     machine_code_int |= (imm & 0xFFFF); // NEGATIVE CASE
-    obj_file.text_segment.at(address >> 2).data = intToBinaryString(machine_code_int);
+    obj_file.text_segment.at(address >> 2).machine_code = machine_code_int;
     return obj_file;
 }
 
@@ -67,7 +67,7 @@ void I_LineAssembler::handleOperand(OperandType op_type, const string &operand) 
                 vector<string> tokens; string instruction;
                 tokens = split(asm_line, "[ \t,]+");
                 instruction = tokens.at(0);
-                obj_file.relocation_info.push_back({address, instruction, operand});
+                obj_file.relocation_information.push_back({address, instruction, operand});
 
             }else{
                 imm = getOperandInt(IMM, operand.substr(0, left));

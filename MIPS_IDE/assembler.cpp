@@ -106,7 +106,7 @@ void Assembler::scanLabels() {
 void Assembler::assembleLines() {
     for (unsigned int i = 0; i < asm_lines.size(); i++) {
         // this is i*2^2
-        obj_file.text_segment.push_back({i << 2, asm_lines.at(i)});
+        obj_file.text_segment.push_back({i << 2,0,asm_lines.at(i)});
         LineAssembler line_assm(obj_file, i << 2);
         obj_file = line_assm.assemble();
     }
@@ -115,7 +115,7 @@ void Assembler::assembleLines() {
 void Assembler::output(const string &file_path) {
     string mc_code = "";
     for (unsigned int i = 0; i < obj_file.text_segment.size(); i++) {
-        mc_code += obj_file.text_segment.at(i).data + "\n";
+        mc_code += obj_file.text_segment.at(i).machine_code + "\n";
     }
     writeFile(file_path, mc_code);
 }

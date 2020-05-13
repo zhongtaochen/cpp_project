@@ -5,7 +5,7 @@
 using namespace std;
 
 LineAssembler::LineAssembler(ObjectFile obj_file, unsigned int address) {
-    this->asm_line = obj_file.text_segment.at(address >> 2).data;
+    this->asm_line = obj_file.text_segment.at(address >> 2).instruction;
     this->obj_file = obj_file;
     this->address = address;
 }
@@ -37,7 +37,7 @@ int LineAssembler::getOperandInt(OperandType op_type, const string &operand) {
                 vector<string> tokens; string instruction;
                 tokens = split(asm_line, "[ \t,]+");
                 instruction = tokens.at(0);
-                obj_file.relocation_info.push_back({address, instruction, operand});
+                obj_file.relocation_information.push_back({address, instruction, operand});
                 return 0;
             }
         default: return -1;
