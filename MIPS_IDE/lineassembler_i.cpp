@@ -13,7 +13,7 @@ using namespace std;
  */
 
 ObjectFile I_LineAssembler::assemble() {
-    int machine_code_int = 0;
+    uint32_t machine_code_int = 0;
     machine_code_int |= (op << 26);
     machine_code_int |= (rs << 21);
     machine_code_int |= (rt << 16);
@@ -26,7 +26,6 @@ I_LineAssembler::I_LineAssembler(string asm_line, ObjectFile obj_file, unsigned 
     this->asm_line = asm_line;
     this->obj_file = obj_file;
     this->address = address;
-    //这里的address是 4 8 12 这样
 
     rs = 0; rt = 0; imm = 0;
     vector<string> tokens = split(asm_line, "[ \t,]+");

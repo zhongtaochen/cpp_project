@@ -3,6 +3,8 @@
 #include "utils.h"
 #include <sstream>
 #include <iostream>
+#include <string>
+#include <bitset>
 using namespace std;
 
 Assembler::Assembler(ifstream &asm_file):Assembler(fileToString(asm_file)){}
@@ -23,41 +25,82 @@ Assembler::Assembler(const string &asm_code) {
 
 }
 
-void Assembler::handleDataSection(const string &asm_data_sec) {
+void Assembler::handleDataSection(const string& asm_data_sec) {
     preprocess(asm_data_sec);
     for (string line : asm_lines) {
-//        cout << intToHexString(obj_file.data_size) << endl;
+        //        cout << intToHexString(obj_file.data_size) << endl;
         vector<string> tokens = split(line, "[ \t]+");
         string type = tokens.at(1);
-        if (type == ".asciiz") {
-            string str = line.substr(line.find("\"")+1, line.rfind("\"")-line.find("\"")-1);
-            str = str + "\0";
+        string data_name = line.substr(0, line.find(":"));
+        obj_file.symbol_table.insert({ "*" + data_name,obj_file.data_size });
+
+        if (type == ".asciiz"||type == ".ascii") {
+            string str = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
+            if (type == ".asciiz") {
+                str = str + "\0";
+            }
             unsigned int word = 0;
-            unsigned int i = 0;
-            for (; i < str.size(); i++) {
+            for (unsigned int i =0; i < str.size(); i++) {
                 char ch = str.at(i);
                 word |= (ch << ((3 - (i % 4)) << 3));
+                uint32_t data = word;
                 if (i % 4 == 3) {
-                    obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(word)});
+                    obj_file.data_segment.push_back({ obj_file.data_size, data });
                     obj_file.data_size += 4;
                     word = 0;
                 }
             }
             if (str.size() % 4 != 0) {
-                obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(word)});
+                uint32_t data = word;
+                obj_file.data_segment.push_back({ obj_file.data_size, data });
                 obj_file.data_size += 4;
             }
-        } else if (type == ".word") {
-            string data_name = line.substr(0,line.find(":"));
-            string data = line.substr(line.find(".word")+5);
+        }
+        else if (type == ".word") {
+            string data = line.substr(line.find(".word") + 5);
             trim(data);
             vector<string> elements = split(data, "[ \t,]+");
             for (string element : elements) {
-                obj_file.data_segment.push_back({obj_file.data_size, intToBinaryString(stoi(element))});
-                //下面这行加入到symbol table 是曲雅慧后来写的，
-                obj_file.symbol_table.insert({"*"+data_name,obj_file.data_size});
+                uint32_t data = stoi(element, 0, 2);
+                obj_file.data_segment.push_back({ obj_file.data_size, data });
                 obj_file.data_size += 4;
+            }
+        }
+        else if (type == ".half") {
+            string data = line.substr(line.find(".half") + 5);
+            trim(data);
+            vector<string> elements = split(data, "[ \t,]+");
+            for (string element : elements) {
+                uint32_t data = std::bitset<32>(stoi(element)).to_ulong();
+                obj_file.data_segment.push_back({ obj_file.data_size, data });
+                obj_file.data_size += 2;
+            }
+            while (obj_file.data_size % 4 != 0) {
+                obj_file.data_segment.push_back({ obj_file.data_size, 0000000000000000 });
+                obj_file.data_size += 2;
+            }
+        }
+        else if (type == ".byte") {
+            string data = line.substr(line.find(".byte") + 5);
+            trim(data);
+            vector<string> elements = split(data, "[ \t,]+");
+            for (string element : elements) {
+                uint32_t data = std::bitset<32>(stoi(element)).to_ulong();
+                obj_file.data_segment.push_back({ obj_file.data_size, data });
+                obj_file.data_size += 1;
+            }
+            while (obj_file.data_size % 4 != 0) {
+                obj_file.data_segment.push_back({ obj_file.data_size, 00000000 });
+                obj_file.data_size += 1;
+            }
 
+        }
+        else if (type == ".space") {
+            string data = line.substr(line.find(".space") + 6);
+            trim(data);
+            for (int i = 0; i < stoi(data); i++) {
+                obj_file.data_segment.push_back({ obj_file.data_size, 00000000000000000000000000000000 });
+                obj_file.data_size += 4;
             }
         }
     }
