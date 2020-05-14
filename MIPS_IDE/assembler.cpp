@@ -61,7 +61,7 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
             trim(data);
             vector<string> elements = split(data, "[ \t,]+");
             for (string element : elements) {
-                uint32_t data = stoi(element, 0, 2);
+                uint32_t data = stoi(element);
                 obj_file.data_segment.push_back({ obj_file.data_size, data });
                 obj_file.data_size += 4;
             }
@@ -71,7 +71,7 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
             trim(data);
             vector<string> elements = split(data, "[ \t,]+");
             for (string element : elements) {
-                uint32_t data = std::bitset<32>(stoi(element)).to_ulong();
+                uint32_t data = stoi(element);
                 obj_file.data_segment.push_back({ obj_file.data_size, data });
                 obj_file.data_size += 2;
             }
@@ -85,7 +85,7 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
             trim(data);
             vector<string> elements = split(data, "[ \t,]+");
             for (string element : elements) {
-                uint32_t data = std::bitset<32>(stoi(element)).to_ulong();
+                uint32_t data = stoi(element);
                 obj_file.data_segment.push_back({ obj_file.data_size, data });
                 obj_file.data_size += 1;
             }
