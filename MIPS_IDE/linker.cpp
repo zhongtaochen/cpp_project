@@ -15,7 +15,6 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
             for (TextCell cell : obj_file.text_segment) {
                 unsigned int absolute_addr = cell.address + curr_text_addr;
                 exe_file.text_segment.push_back({absolute_addr, cell.machine_code,cell.instruction});
-                exe_file.text_size += 4;
             }
             for (auto const& pair : obj_file.symbol_table) {
                 if (pair.first.find("*") != string::npos) {
@@ -29,6 +28,7 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
                 unsigned int absolute_addr = cell.address + curr_data_addr;
                 exe_file.data_segment.push_back({absolute_addr, cell.data});                
             }
+            exe_file.text_size += obj_file.text_size;
             exe_file.data_size += obj_file.data_size;
 
         }
