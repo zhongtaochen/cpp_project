@@ -22,7 +22,6 @@ Assembler::Assembler(const string& asm_code) {
     else {
         handleTextSection(asm_code);
     }
-
 }
 
 void Assembler::handleDataSection(const string& asm_data_sec) {
@@ -43,16 +42,14 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
             for (unsigned int i = 0; i < str.size(); i++) {
                 char ch = str.at(i);
                 word |= (ch << ((3 - (i % 4)) << 3));
-                uint32_t data = word;
                 if (i % 4 == 3) {
-                    obj_file.data_segment.push_back({ obj_file.data_size, data });
+                    obj_file.data_segment.push_back({ obj_file.data_size, word});
                     obj_file.data_size += 4;
                     word = 0;
                 }
             }
             if (str.size() % 4 != 0) {
-                uint32_t data = word;
-                obj_file.data_segment.push_back({ obj_file.data_size, data });
+                obj_file.data_segment.push_back({ obj_file.data_size, word });
                 obj_file.data_size += 4;
             }
         }
@@ -70,28 +67,50 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
             string data = line.substr(line.find(".half") + 5);
             trim(data);
             vector<string> elements = split(data, "[ \t,]+");
+            int i = 0;
+            uint32_t word = 0;
             for (string element : elements) {
-                uint32_t data = stoi(element);
-                obj_file.data_segment.push_back({ obj_file.data_size, data });
-                obj_file.data_size += 2;
+                if (i % 2 == 1) {
+                    unsigned int data = stoi(element);
+                    word |= data;
+                    obj_file.data_segment.push_back({ obj_file.data_size, word});
+                    obj_file.data_size += 4;
+                    word = 0;
+                }else {
+                    unsigned int data = stoi(element);
+                    word |= (data << 16);
+                }
+                i += 1;
             }
-            while (obj_file.data_size % 4 != 0) {
-                obj_file.data_segment.push_back({ obj_file.data_size, 0000000000000000 });
-                obj_file.data_size += 2;
+            if (elements.size() % 2 != 0) {
+                obj_file.data_segment.push_back({ obj_file.data_size, word});
+                obj_file.data_size += 4;
             }
         }
         else if (type == ".byte") {
             string data = line.substr(line.find(".byte") + 5);
             trim(data);
             vector<string> elements = split(data, "[ \t,]+");
+            int i = 0;
+            uint32_t word = 0;
             for (string element : elements) {
-                uint32_t data = stoi(element);
-                obj_file.data_segment.push_back({ obj_file.data_size, data });
-                obj_file.data_size += 1;
+                unsigned int data = stoi(element);
+                if (stoi(element) < 0) {
+                    data &= 0x000000ff;
+                }
+                if (i % 4 == 0) {word |= data << 24;
+                }else if (i % 4 == 1) {word |= data << 16;
+                }else if (i % 4 == 2) {word |= data << 8;
+                }else{
+                    obj_file.data_segment.push_back({ obj_file.data_size, word});
+                    obj_file.data_size += 4;
+                    word = 0;
+                }
+                i += 1;
             }
-            while (obj_file.data_size % 4 != 0) {
-                obj_file.data_segment.push_back({ obj_file.data_size, 00000000 });
-                obj_file.data_size += 1;
+            if (elements.size() % 4 != 0) {
+                obj_file.data_segment.push_back({ obj_file.data_size, word});
+                obj_file.data_size += 4;
             }
 
         }
