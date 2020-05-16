@@ -4,8 +4,7 @@
 #include "objectfile.h"
 #include "executablefile.h"
 #include <vector>
-#include "utils.h"
-using namespace std;
+
 class Linker {
 
 public:

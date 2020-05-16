@@ -54,25 +54,12 @@ void I_LineAssembler::handleOperand(OperandType op_type, const string &operand) 
         case RS: rs = getOperandInt(op_type, operand); break;
         case RT: rt = getOperandInt(op_type, operand); break;
         case IMM: imm = getOperandInt(op_type, operand); break;
-        //这里被曲改掉了-1
-        case LABEL: imm = (getOperandInt(op_type, operand) - address) >> 2; break;
+        case LABEL: imm = (getOperandInt(op_type, operand) - address - 4) >> 2; break;
         case IMM_RS:
             left = operand.find("(");
             right = operand.find(")");
-            //这里的if是曲加上的， 因为operand 可能是个label需要被linker处理，需读取dataseg的数据
-            if(left == right){ //cannot find
-                imm = 0;
-                rs = 0;
-                vector<string> tokens; string instruction;
-                tokens = split(asm_line, "[ \t,]+");
-                instruction = tokens.at(0);
-                obj_file.relocation_information.push_back({address, instruction, operand});
-
-            }else{
-                imm = getOperandInt(IMM, operand.substr(0, left));
-                rs = getOperandInt(RS, operand.substr(left+1, right-left-1));
-            }
-
+            imm = getOperandInt(IMM, operand.substr(0, left));
+            rs = getOperandInt(RS, operand.substr(left+1, right-left-1));
             break;
         default: break;
     }

@@ -7,11 +7,13 @@ using namespace std;
 
 
 Linker::Linker(vector<ObjectFile> &obj_file_list) {
+    exe_file.text_size = 0;
+    exe_file.data_size = 0;
     if (obj_file_list.size() >= 1) {
         map<string, unsigned int> symbol_table;
         for (ObjectFile obj_file : obj_file_list) {
-            unsigned int curr_text_addr = exe_file.text_size + 0x00400000;
-            unsigned int curr_data_addr = exe_file.data_size + 0x00500000;
+            uint32_t curr_text_addr = exe_file.text_size + 0x00400000;
+            uint32_t curr_data_addr = exe_file.data_size + 0x00500000;
             for (TextCell cell : obj_file.text_segment) {
                 unsigned int absolute_addr = cell.address + curr_text_addr;
                 exe_file.text_segment.push_back({absolute_addr, cell.machine_code,cell.instruction});
@@ -39,16 +41,23 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
                 for (RelocationCell reloc : obj_file.relocation_information) {
                     int sum = start_text_locat +reloc.address;
                     TextCell cell = exe_file.text_segment.at(sum>>2);
-                    uint32_t mc_code_int  = cell.machine_code;         
-                    if (reloc.instruciton_type == "j" || reloc.instruciton_type == "jal") { // J-type
+                    uint32_t mc_code_int  = cell.machine_code;
+                    cout << intToBinaryString(mc_code_int) << endl;
+                    if (reloc.instruction_type == "j" || reloc.instruction_type == "jal") { // J-type
                         mc_code_int &= 0xfc000000;
-                        mc_code_int |= ((symbol_table.at(reloc.dependency) &= ~0xf0000000) >> 2);
-                    }else if(i_type->find(reloc.instruciton_type)){ // i-type
+//                        cout << symbol_table.count(reloc.dependency) << endl;
+//                        cout << symbol_table.at(reloc.dependency) << endl;
+//                        cout << (symbol_table.at(reloc.dependency) & (~0xf0000000)) << endl;
+//                        cout << intToHexString(((symbol_table.at(reloc.dependency) & (~0xf0000000))) >> 2) << endl;
+                        mc_code_int |= ((symbol_table.at(reloc.dependency) & (~0xf0000000))) >> 2;
+                        cout << intToBinaryString(mc_code_int) << endl;
+                    }else if(i_type->find(reloc.instruction_type)){ // i-type
                         
                         mc_code_int &= 0xffff0000;
                         //static const unsigned int __data_addr = 0x00500000;                 
-                        string addrs_diff = intToHexString(symbol_table.at(reloc.dependency)- 0x00500000);//offset w.r.t $gp
-                        unsigned int addrs_diff_int  = std::stoul(addrs_diff,nullptr,16); 
+//                        string addrs_diff = intToHexString(symbol_table.at(reloc.dependency)- 0x00500000);//offset w.r.t $gp
+//                        unsigned int addrs_diff_int  = std::stoul(addrs_diff,nullptr,16);
+                        uint32_t addrs_diff_int = symbol_table.at(reloc.dependency)- 0x00500000;
                         mc_code_int |= 0x0000ffff&addrs_diff_int;
                     }
                     exe_file.text_segment.at(sum>> 2).machine_code = mc_code_int;

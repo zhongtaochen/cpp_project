@@ -12,7 +12,7 @@ struct Format {OperandType op1; OperandType op2; OperandType op3; int id;};
 class LineAssembler {
 public:
 
-/** Bins are implemented in file line_assembler_data.cpp */
+/** Bins recording necessary information. */
 
     const static std::map<std::string, Format> R_BIN;
     const static std::map<std::string, Format> I_BIN;
@@ -20,19 +20,13 @@ public:
     const static std::vector<std::string> REG_BIN;
 
 /**
- * Constructor: LineAssembler
- * Usage: Line_Assembler line_assm(obj_file, address);
- * ---------------------------------------------------
- * @brief Initializes a LineAssembler object.
+ * @brief Initializes a <code>LineAssembler</code> object.
  */
 
-    LineAssembler(ObjectFile obj_file, unsigned int address);
+    LineAssembler(ObjectFile obj_file, uint32_t address);
 
 /**
- * Method: assemble
- * Usage: string machine_code = line_assm.assemble();
- * --------------------------------------------------
- * @brief Returns machine code for valid line of Assembly code.
+ * @brief Returns assembled object file.
  */
 
     virtual ObjectFile assemble();
@@ -41,28 +35,22 @@ protected:
 
     std::string asm_line;
     ObjectFile obj_file;
-    unsigned int address;
+    uint32_t address;
 
 /**
- * Constructor: LineAssembler
- * ---------------------------
- * @brief Void default constructor.
+ * @brief Void default constructor. Hidden from the clients.
  */
+
     LineAssembler(){};
 
 /**
- * Method: handleOperand
- * Usage: handleOperand(op_type, op);
- * ----------------------------------
  * @brief Void method. Overriden in subclasses.
  */
+
     virtual void handleOperand(OperandType op_type, const std::string &op){};
 
 /**
- * Method: getOperandInt
- * Usage: int op = getOperandInt(op_type, operand);
- * ------------------------------------------------
- * @return Integer representation of a operand.
+ * @brief Returns integer representation of a operand.
  */
 
     int getOperandInt(OperandType op_type, const std::string &operand);
@@ -70,10 +58,7 @@ protected:
 private:
 
 /**
- * Method: getRegInt
- * Usage: int reg = getRegInt(reg);
- * --------------------------------
- * @return Integer representation of a register.
+ * @brief Returns integer representation of a register.
  */
 
     int getRegInt(const std::string &reg);
@@ -84,14 +69,11 @@ class R_LineAssembler : LineAssembler {
 public:
 
 /**
- * Constructor: R_LineAssembler
- * Usage: R_LineAssembler r_line_assm(asm_line);
- * ----------------------------------------------
- * @brief Construct a R_LineAssembler object.\n
- *        Initialize all private characteristic attributes.
+ * @brief Construct a <code>R_LineAssembler</code> object.
+ * Initialize all private characteristic attributes.
  */
 
-    R_LineAssembler(std::string asm_line, ObjectFile obj_file, unsigned int address);
+    R_LineAssembler(std::string asm_line, ObjectFile obj_file, uint32_t address);
 
     ObjectFile assemble() override;
 
@@ -106,14 +88,11 @@ class I_LineAssembler : LineAssembler {
 public:
 
 /**
- * Constructor: I_LineAssembler
- * Usage: I_LineAssembler i_line_assm(asm_line, pc, label_bin);
- * -------------------------------------------------------------
- * @brief Construct an I_LineAssembler object.\n
- *        Initialize all private characteristic attributes.
+ * @brief Construct an <code>I_LineAssembler</code> object.
+ * Initialize all private characteristic attributes.
  */
 
-    I_LineAssembler(std::string asm_line, ObjectFile obj_file, unsigned int address);
+    I_LineAssembler(std::string asm_line, ObjectFile obj_file, uint32_t address);
 
     ObjectFile assemble() override;
 
@@ -129,14 +108,11 @@ class J_LineAssembler : LineAssembler {
 public:
 
 /**
- * Constructor: J_LineAssembler
- * Usage: J_LineAssembler j_line_assm(asm_line, label_bin);
- * ---------------------------------------------------------
- * @brief Construct a J_LineAssembler object.\n
- *        Initialize all private characteristic attributes.
+ * @brief Construct a <code>J_LineAssembler</code> object.
+ * Initialize all private characteristic attributes.
  */
 
-    J_LineAssembler(std::string asm_line, ObjectFile obj_file, unsigned int address);
+    J_LineAssembler(std::string asm_line, ObjectFile obj_file, uint32_t address);
 
     ObjectFile assemble() override;
 

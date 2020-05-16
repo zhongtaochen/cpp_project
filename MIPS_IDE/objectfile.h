@@ -33,14 +33,13 @@ struct DataCell{
     uint32_t address;
     uint32_t data;
 };
- 
 
 /**
  * @brief Basic unit for relocation information in <code>ObjectFile</code>.
  */
 struct RelocationCell{
     uint32_t address;
-    std::string instruciton_type;
+    std::string instruction_type;
     std::string dependency;
 };
 
@@ -64,7 +63,7 @@ public:
     std::vector<TextCell> text_segment;
     std::vector<DataCell> data_segment;
     std::vector<RelocationCell> relocation_information;
-    std::map<std::string, unsigned int> symbol_table;
+    std::map<std::string, uint32_t> symbol_table;
 
 };
 

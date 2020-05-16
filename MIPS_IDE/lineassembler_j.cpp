@@ -12,14 +12,18 @@ using namespace std;
  */
 
 ObjectFile J_LineAssembler::assemble() {
-    int machine_code_int = 0;
+    uint32_t machine_code_int = 0;
     machine_code_int |= (op << 26);
     machine_code_int |= target;
     obj_file.text_segment.at(address >> 2).machine_code = machine_code_int;
     return obj_file;
 }
 
-J_LineAssembler::J_LineAssembler(string asm_line, ObjectFile obj_file, unsigned int address) {
+/**
+ * @details All J-type instructions involve absolute address.
+ * No operand handling. Immediately fill the relocation information.
+ */
+J_LineAssembler::J_LineAssembler(string asm_line, ObjectFile obj_file, uint32_t address) {
     this->asm_line = asm_line;
     this->obj_file = obj_file;
     this->address = address;
@@ -27,22 +31,9 @@ J_LineAssembler::J_LineAssembler(string asm_line, ObjectFile obj_file, unsigned 
     vector<string> tokens = split(asm_line, "[ \t,]+");
     string instruction = tokens.at(0);
     Format format = J_BIN.at(instruction);
-    op = format.id;
-    if (format.op1) handleOperand(format.op1, tokens.at(1));
+    op = format.id; target = 0;
+
+    this->obj_file.relocation_information.push_back({address, instruction, tokens.at(1)});
 }
 
-void J_LineAssembler::handleOperand(OperandType op_type, const string &op) {
-    vector<string> tokens; string instruction;
-    switch (op_type) {
-        case LABEL:
-            target = getOperandInt(op_type, op) >> 2;
-            tokens = split(asm_line, "[ \t,]+");
-            instruction = tokens.at(0);
-            if(target!=0){
-                obj_file.relocation_information.push_back({address, instruction, op});
-            }
-
-            break;
-        default: break;
-    }
-}
+void J_LineAssembler::handleOperand(OperandType op_type, const std::string &op){};

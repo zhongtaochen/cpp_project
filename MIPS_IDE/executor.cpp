@@ -16,7 +16,7 @@ uint32_t Executor::execute(uint32_t instruction) {
     pc += 4;
 
     uint32_t opcode = instruction >> 26;
-    uint32_t rs = (instruction >> 21) & 0x3f;
+    uint32_t rs = (instruction >> 21) & 0x1f;
     uint32_t rt = (instruction >> 16) & 0x1f;
     uint32_t rd = (instruction >> 11) & 0x1f;
     uint32_t sa = (instruction >> 6) & 0x1f;
@@ -49,16 +49,6 @@ uint32_t Executor::execute(uint32_t instruction) {
             pc = (*reg)[rs];
         } else if (fn == 0b001000) { // jr
             pc = (*reg)[rs];
-        } else if (fn == 0b100000) { // lb
-            (*reg)[rt] = (int8_t) mem->readByte(offset);
-        } else if (fn == 0b100100) { // lbu
-            (*reg)[rt] = (uint8_t) mem->readByte(offset);
-        } else if (fn == 0b100001) { // lh
-            (*reg)[rt] = (int16_t) mem->readHalfWord(offset);
-        } else if (fn == 0b100101) { // lhu
-            (*reg)[rt] = (uint16_t) mem->readHalfWord(offset);
-        } else if (fn == 0b100011) { // lw
-            (*reg)[rt] = mem->readWord(offset);
         } else if (fn == 0b010000) { // mfhi
             (*reg)[rd] = (*reg)[32];
         } else if (fn == 0b010010) { // mflo
@@ -79,10 +69,6 @@ uint32_t Executor::execute(uint32_t instruction) {
             (*reg)[rd] = ~((*reg)[rs] | (*reg)[rt]);
         } else if (fn == 0b100101) { // or
             (*reg)[rd] = (*reg)[rs] | (*reg)[rt];
-        } else if (fn == 0b101000) { // sb
-            mem->writeByte(offset, (*reg)[rt]);
-        } else if (fn == 0b101001) { // sh
-            mem->writeHalfWord(offset, (*reg)[rt]);
         } else if (fn == 0b000000) { // sll
             (*reg)[rd] = (*reg)[rt] << sa;
         } else if (fn == 0b000100) { // sllv
@@ -103,8 +89,6 @@ uint32_t Executor::execute(uint32_t instruction) {
             (*reg)[rd] = (*reg)[rs] - (*reg)[rt];
         } else if (fn == 0b100011) { // subu
             (*reg)[rd] = (*reg)[rs] - (*reg)[rt];
-        } else if (fn == 0b101011) { // sw
-            mem->writeWord(offset, (*reg)[rt]);
         } else if (fn == 0b001100) { // syscall
             syscall();
         } else if (fn == 0b110100) { // teq
@@ -152,8 +136,18 @@ uint32_t Executor::execute(uint32_t instruction) {
         if ((int32_t)(*reg)[rs] < 0) pc = branch;
     } else if (opcode == 0b000101) { // bne
         if ((*reg)[rs] != (*reg)[rt]) pc = branch;
+    } else if (opcode == 0b100000) { // lb
+        (*reg)[rt] = (int8_t) mem->readByte(offset);
+    } else if (opcode == 0b100100) { // lbu
+        (*reg)[rt] = (uint8_t) mem->readByte(offset);
+    } else if (opcode == 0b100001) { // lh
+        (*reg)[rt] = (int16_t) mem->readHalfWord(offset);
+    } else if (opcode == 0b100101) { // lhu
+        (*reg)[rt] = (uint16_t) mem->readHalfWord(offset);
     } else if (opcode == 0b001111) { // lui
         (*reg)[rt] = imm_zero << 16;
+    } else if (opcode == 0b100011) { // lw
+        (*reg)[rt] = mem->readWord(offset);
     } else if (opcode == 0b000010) { // j
         pc = target;
     } else if (opcode == 0b000011) { // jal
@@ -161,10 +155,16 @@ uint32_t Executor::execute(uint32_t instruction) {
         pc = target;
     } else if (opcode == 0b001101) { // ori
         (*reg)[rt] = (*reg)[rs] | imm_zero;
+    } else if (opcode == 0b101000) { // sb
+        mem->writeByte(offset, (*reg)[rt]);
+    } else if (opcode == 0b101001) { // sh
+        mem->writeHalfWord(offset, (*reg)[rt]);
     } else if (opcode == 0b001010) { // slti
         (*reg)[rt] = ((int32_t)(*reg)[rs] < (int32_t)(imm_sign)) ? 1 : 0;
     } else if (opcode == 0b001011) { // sltiu
         (*reg)[rt] = ((uint32_t)(*reg)[rs] < (uint32_t)(imm_sign)) ? 1 : 0;
+    } else if (opcode == 0b101011) { // sw
+        mem->writeWord(offset, (*reg)[rt]);
     } else if (opcode == 0b000001 && rt == 0b01100) { // teqi
         if ((int32_t)(*reg)[rs] == imm_sign) trap(pc-4, "Trap if equal immediate.");
     } else if (opcode == 0b000001 && rt == 0b01110) { // tnei
@@ -199,7 +199,7 @@ void Executor::syscall() {
     } else if ((*reg)[2] == 5) { // read_int
         int32_t in;
         std::cin >> in;
-        reg->writeReg(4, in);
+        reg->writeReg(2, in);
     } else if ((*reg)[2] == 8) { // read_string
         uint32_t address = (*reg)[4];
         uint32_t length = (*reg)[5];
@@ -215,12 +215,11 @@ void Executor::syscall() {
     } else if ((*reg)[2] == 10) { // exit
         exit(0);
     } else if ((*reg)[2] == 11) { // print_char
-        uint32_t address = (*reg)[4];
-        std::cout << (char) mem->readByte(address) << std::endl;
+        std::cout << (char) (*reg)[4] << std::endl;
     } else if ((*reg)[2] == 12) { // read_char
         char in;
         std::cin >> in;
-        reg->writeReg(4, in);
+        reg->writeReg(2, in);
     } else if ((*reg)[2] == 13) { // open
         uint32_t address = (*reg)[4];
         char curr_char = mem->readByte(address);

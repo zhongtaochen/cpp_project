@@ -1,12 +1,13 @@
 #include "utils.h"
-#include <sstream>
+#include "assembler.h"
 #include <iostream>
+#include <sstream>
 #include <regex>
 #include <iomanip>
 #include <bitset>
 using namespace std;
 
-string fileToString(ifstream &file) {
+string fileToString(const ifstream &file) {
     stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
@@ -46,10 +47,6 @@ vector<string> split(const string &s, const string &delim) {
     return tokens;
 }
 
-string intToBinaryString(int machine_code_int) {
-    return bitset<32>(machine_code_int).to_string();
-}
-
 string intToHexString(unsigned int num) {
     stringstream sstrm;
     sstrm << "0x"
@@ -58,16 +55,6 @@ string intToHexString(unsigned int num) {
     return sstrm.str();
 }
 
-void error(string msg) {
-    cerr << msg << endl;
-    exit(EXIT_FAILURE);
-}
-
-bool isBinaryString(string str, unsigned int digits) {
-    return str.length() == digits && regex_match(str, regex("^[01]+$"));
-}
-
-unsigned long binaryStringToInt(const string &str) {
-    bitset<32> bs(str);
-    return bs.to_ulong();
+string intToBinaryString(int machine_code_int) {
+    return bitset<32>(machine_code_int).to_string();
 }

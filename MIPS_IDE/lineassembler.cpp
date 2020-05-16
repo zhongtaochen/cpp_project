@@ -4,7 +4,7 @@
 #include <iterator>
 using namespace std;
 
-LineAssembler::LineAssembler(ObjectFile obj_file, unsigned int address) {
+LineAssembler::LineAssembler(ObjectFile obj_file, uint32_t address) {
     this->asm_line = obj_file.text_segment.at(address >> 2).instruction;
     this->obj_file = obj_file;
     this->address = address;
