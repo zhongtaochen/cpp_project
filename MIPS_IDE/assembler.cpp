@@ -1,4 +1,4 @@
-#include "assembler.h"
+﻿#include "assembler.h"
 #include "lineassembler.h"
 #include "sstream"
 #include "utils.h"
@@ -14,7 +14,6 @@ Assembler::Assembler(const string &asm_code) {
         string asm_data_sec = asm_code.substr(data_pos+5, text_pos-data_pos-5);
         handleDataSection(asm_data_sec);
         asm_lines.clear();
-
         string asm_text_sec = asm_code.substr(text_pos+5);
         handleTextSection(asm_text_sec);
     } else { // if data section does not exist, no ".text" remark exists
@@ -159,15 +158,19 @@ void Assembler::scanLabels() {
 }
 
 void Assembler::handleTextSection(const string &asm_text_sec) {
-    preprocess(asm_text_sec);
     obj_file.text_size = asm_lines.size() << 2;
+    preprocess(asm_text_sec);
     scanLabels();
+    pseudoConversion();
     for (unsigned int i = 0; i < asm_lines.size(); i++) {
+        
         obj_file.text_segment.push_back({ i << 2, 0, asm_lines.at(i) });
         LineAssembler line_assm(obj_file, i << 2);
         obj_file = line_assm.assemble();
     }
 }
+
+
 
 void Assembler::output(const string& file_path) {
     string mc_code = "";
@@ -176,3 +179,119 @@ void Assembler::output(const string& file_path) {
     }
     writeFile(file_path, mc_code);
 }
+ 
+void Assembler::pseudoConversion() {
+    string asm_line;
+    for (unsigned int i = 0; i < asm_lines.size(); i++) {    
+        
+        asm_line = asm_lines.at(i);
+        vector<string> tokens = split(asm_line, "[ \t,]+");
+        string instruction = tokens.at(0);
+        //Format_Pseudo format = Pseudo_Bin.at(instruction);
+        vector<vector<string>> new_instructions;
+        if (instruction == "mul") {
+            new_instructions.push_back({ "mult", tokens[2], tokens[3] });
+            new_instructions.push_back({ "mflo", tokens[1] });
+            
+        }
+        else if (instruction == "div"&& tokens[3].find("$") != tokens[3].npos) {
+        //else if (instruction == "div" && format.op3 != NONE) {
+            new_instructions.push_back({ "div", tokens[2], tokens[3] });
+            new_instructions.push_back({ "mflo", tokens[1] });
+            
+        }
+        else if (instruction == "rem") {
+            new_instructions.push_back({ "div", tokens[2], tokens[3] });
+            new_instructions.push_back({ "mfhi", tokens[1] });
+        }
+        else if (instruction == "move") {
+            new_instructions.push_back({ "or", tokens[1], tokens[2], "$zero" });
+        }
+        else if (instruction == "clear") {
+            new_instructions.push_back({ "or", tokens[1], "$zero", "$zero" });
+        }
+        else if (instruction == "li") {
+            string C_hi = intToBinaryString(stoi(tokens[2])).substr(0, 16);
+            string C_lo = intToBinaryString(stoi(tokens[2])).substr(16, 16);
+            new_instructions.push_back({ "lui", tokens[1], C_hi });
+            new_instructions.push_back({ "ori", tokens[1], tokens[1], C_lo });
+        }
+        else if (instruction == "la") {
+            string A_hi = intToBinaryString(stoi(tokens[2])).substr(0, 16);
+            string A_lo = intToBinaryString(stoi(tokens[2])).substr(16, 16);
+            new_instructions.push_back({ "lui", tokens[1], A_hi });
+            new_instructions.push_back({ "ori", tokens[1], tokens[1], A_lo });
+        }
+        else if (instruction == "b") {
+            new_instructions.push_back({ "beq", "$zero", "$zero", tokens[1] });
+        }
+        else if (instruction == "bal") {
+            new_instructions.push_back({ "bgezal", "$zero", tokens[1] });
+        }
+        else if (instruction == "bgt") {
+            new_instructions.push_back({ "slt", "$at", tokens[2], tokens[1] });
+            new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
+        }
+        else if (instruction == "blt") {
+            new_instructions.push_back({ "slt", "$at", tokens[1], tokens[2] });
+            new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
+        }
+        else if (instruction == "bge") {
+            new_instructions.push_back({ "slt", "$at", tokens[1], tokens[2] });
+            new_instructions.push_back({ "beq", "$at", "$zero", tokens[3] });
+        }
+        else if (instruction == "ble") {
+            new_instructions.push_back({ "slt", "$at", tokens[2], tokens[1] });
+            new_instructions.push_back({ "beq", "$at", "$zero", tokens[3] });
+        }
+        else if (instruction == "bgtu") {
+            new_instructions.push_back({ "sltu", "$at", tokens[2], tokens[1] });
+            new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
+        }
+        else if (instruction == "beqz") {
+            new_instructions.push_back({ "beq", tokens[1], "$zero", tokens[2] });
+        }
+        else if (instruction == "beq" && tokens[2].find("$") == tokens[2].npos) {
+            new_instructions.push_back({ "ori", "$at", "$zero", tokens[2] });
+            new_instructions.push_back({ "beq", tokens[1], "$at", tokens[3] });
+        }
+        else if (instruction == "bne") {
+            new_instructions.push_back({ "ori", "$at", "$zero", tokens[2] });
+            new_instructions.push_back({ "bne", tokens[1], "$at", tokens[3] });
+        }
+        else if (instruction == "jalr") {
+            new_instructions.push_back({ "jalr", tokens[1], "$ra" });
+        }
+        else if (instruction == "not") {
+            new_instructions.push_back({ "nor", tokens[1], tokens[2], "$zero" });
+        }
+        else if (instruction == "nop") {
+            new_instructions.push_back({ "sll", "$zero", "$zero", "0" });
+        }
+        else if (instruction == "abs") {
+            new_instructions.push_back({ "sra", "$at", tokens[2], "31" });
+            new_instructions.push_back({ "xor", tokens[1], tokens[2], "$at" });
+            new_instructions.push_back({ "subu", tokens[1], tokens[1], "$at" });
+        }
+        else if (instruction == "mulou") {
+            new_instructions.push_back({ "multu", tokens[2], tokens[3] });
+            new_instructions.push_back({ "mflo", tokens[1] });
+        }
+        else if (instruction == "remu") {
+            new_instructions.push_back({ "divu", tokens[2], tokens[3] });
+            new_instructions.push_back({ "mfhi", tokens[1] });
+        }
+        insertConverted(asm_lines, i, new_instructions);
+    }
+
+    //    for (unsigned int i = 0; i < asm_lines.size(); i++){
+    //        asm_line = asm_lines.at(i);
+    ////        cout << asm_line;
+    //        vector<string> tokens = split(asm_line, "[ \t,]+");
+    //        for (unsigned int j = 0; j < tokens.size(); j++){
+    //            cout << tokens[j] << endl;
+    //            cout << j << endl;
+    //        }
+    //    }
+}
+

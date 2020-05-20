@@ -26,6 +26,7 @@ ObjectFile LineAssembler::assemble() {
     return ObjectFile();
 }
 
+
 int LineAssembler::getOperandInt(OperandType op_type, const string &operand) {
     switch (op_type) {
         case RD: case RS: case RT: return getRegInt(operand);

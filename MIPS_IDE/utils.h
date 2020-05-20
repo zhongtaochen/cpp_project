@@ -55,4 +55,26 @@ std::string intToHexString(unsigned int num);
 std::string intToBinaryString(int machine_code_int);
 
 
+/**
+ * Function: combineString
+ * Usage: string strv = combineString(str)
+ * -----------------------------------------
+ * @brief Given a vector of strings, combine it element-wise
+ * with a space in between. For example, combine vector {"a
+ * , "b", "c"} into "a b c".
+ */
+std::string combineString(std::vector<std::string> str);
+
+/**
+ * Function: insertConverted
+ * Usage: vector<string> str_vec = insertConverted(str_vec, i, vec_str_vec);
+ * -----------------------------------------
+ * @brief Given a vector of strings "str_vec", modify it by
+ * replacing its i-th element with a vector of string vectors,
+ * for example, replacing "b" by "b0" and "b1" so that {"a", "b", "c"}
+ * turns out to be {"a", "b0", "b1", "c"}.
+ */
+ void insertConverted(std::vector<std::string> &str_vec, unsigned int pos,
+    std::vector<std::vector<std::string>> vec_str_vec);
+
 #endif // UTILS_H

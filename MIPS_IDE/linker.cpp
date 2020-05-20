@@ -42,15 +42,10 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
                     int sum = start_text_locat +reloc.address;
                     TextCell cell = exe_file.text_segment.at(sum>>2);
                     uint32_t mc_code_int  = cell.machine_code;
-                    cout << intToBinaryString(mc_code_int) << endl;
                     if (reloc.instruction_type == "j" || reloc.instruction_type == "jal") { // J-type
                         mc_code_int &= 0xfc000000;
-//                        cout << symbol_table.count(reloc.dependency) << endl;
-//                        cout << symbol_table.at(reloc.dependency) << endl;
-//                        cout << (symbol_table.at(reloc.dependency) & (~0xf0000000)) << endl;
-//                        cout << intToHexString(((symbol_table.at(reloc.dependency) & (~0xf0000000))) >> 2) << endl;
                         mc_code_int |= ((symbol_table.at(reloc.dependency) & (~0xf0000000))) >> 2;
-                        cout << intToBinaryString(mc_code_int) << endl;
+                        
                     }else if(i_type->find(reloc.instruction_type)){ // i-type
                         
                         mc_code_int &= 0xffff0000;

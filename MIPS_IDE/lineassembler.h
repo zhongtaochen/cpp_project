@@ -6,8 +6,9 @@
 #include <string>
 #include <vector>
 
-enum OperandType {NONE, RD, RS, RT, SA, IMM, IMM_RS, LABEL};
+enum OperandType { NONE, RD, RS, RT, SA, IMM, IMM_RS, LABEL };
 struct Format {OperandType op1; OperandType op2; OperandType op3; int id;};
+
 
 class LineAssembler {
 public:
@@ -18,6 +19,8 @@ public:
     const static std::map<std::string, Format> I_BIN;
     const static std::map<std::string, Format> J_BIN;
     const static std::vector<std::string> REG_BIN;
+
+    
 
 /**
  * @brief Initializes a <code>LineAssembler</code> object.
@@ -54,6 +57,7 @@ protected:
  */
 
     int getOperandInt(OperandType op_type, const std::string &operand);
+
 
 private:
 
