@@ -196,6 +196,7 @@ void Executor::syscall() {
             std::cout << curr_char;
             curr_char = mem->readByte(++address);
         }
+        std::cout << std::endl;
     } else if ((*reg)[2] == 5) { // read_int
         int32_t in;
         std::cin >> in;
@@ -229,6 +230,7 @@ void Executor::syscall() {
             curr_char = mem->readByte(++address);
         }
         files_record.push_back(file_name);
+        (*reg)[4] = files_record.size()-1;
     } else if ((*reg)[2] == 14) { // read
         std::string file_name = files_record.at((*reg)[4]);
         uint32_t address = (*reg)[5];
@@ -252,7 +254,7 @@ void Executor::syscall() {
         uint32_t num_chars_written = 0;
         for (;num_chars_written < length; num_chars_written++) {
             curr_char = mem->readByte(address+num_chars_written);
-            outfile << curr_char;
+            outfile << (char) curr_char;
         }
         (*reg)[4] = num_chars_written;
     } else if ((*reg)[2] == 16) { // close

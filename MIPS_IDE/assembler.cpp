@@ -20,10 +20,10 @@ Assembler::Assembler(const string &asm_code) {
     } else { // if data section does not exist, no ".text" remark exists
         handleTextSection(asm_code);
     }
-//    handleTextSection(asm_code);
 }
 
 void Assembler::handleDataSection(const string& asm_data_sec) {
+    obj_file.data_size = 0;
     preprocess(asm_data_sec);
     for (string line : asm_lines) {
         //        cout << intToHexString(obj_file.data_size) << endl;
@@ -35,7 +35,7 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
         if (type == ".asciiz" || type == ".ascii") {
             string str = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
             if (type == ".asciiz") {
-                str = str + "\0";
+                str = str + '\0';
             }
             unsigned int word = 0;
             for (unsigned int i = 0; i < str.size(); i++) {
@@ -101,6 +101,7 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
                 }else if (i % 4 == 1) {word |= data << 16;
                 }else if (i % 4 == 2) {word |= data << 8;
                 }else{
+                    word |= data;
                     obj_file.data_segment.push_back({ obj_file.data_size, word});
                     obj_file.data_size += 4;
                     word = 0;
