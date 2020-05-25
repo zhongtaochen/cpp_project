@@ -35,7 +35,7 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
 
         }
         unsigned int start_text_locat = 0;
-        string i_type[] =  {"0","lb","lbu","lhu","lw","lwcl","sb","sh"};
+        string i_type[] =  {"0","lb","lbu","lhu","lw","lwcl","sb","sh","bgez","bgtz","blez","bltz","bgezal","bltzal"};
         for (ObjectFile obj_file : obj_file_list) {
             if(!obj_file.relocation_information.empty()){
                 for (RelocationCell reloc : obj_file.relocation_information) {
@@ -46,8 +46,7 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
                         mc_code_int &= 0xfc000000;
                         mc_code_int |= ((symbol_table.at(reloc.dependency) & (~0xf0000000))) >> 2;
                         
-                    }else if(i_type->find(reloc.instruction_type)){ // i-type
-                        
+                    }else if(i_type->find(reloc.instruction_type)){ // i-type                  
                         mc_code_int &= 0xffff0000;
                         //static const unsigned int __data_addr = 0x00500000;                 
 //                        string addrs_diff = intToHexString(symbol_table.at(reloc.dependency)- 0x00500000);//offset w.r.t $gp

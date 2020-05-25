@@ -16,7 +16,12 @@ Assembler::Assembler(const string &asm_code) {
         asm_lines.clear();
         string asm_text_sec = asm_code.substr(text_pos+5);
         handleTextSection(asm_text_sec);
-    } else { // if data section does not exist, no ".text" remark exists
+    } else if(text_pos!= asm_code.npos) { // if data section does not exist, but ".text" remark exists
+        asm_lines.clear();
+        string asm_text_sec = asm_code.substr(text_pos + 5);
+        handleTextSection(asm_text_sec);
+    }
+    else {  // if no ".text" or ".data" remark exists
         handleTextSection(asm_code);
     }
 }
@@ -158,12 +163,11 @@ void Assembler::scanLabels() {
 }
 
 void Assembler::handleTextSection(const string &asm_text_sec) {
-    obj_file.text_size = asm_lines.size() << 2;
     preprocess(asm_text_sec);
     scanLabels();
     pseudoConversion();
-    for (unsigned int i = 0; i < asm_lines.size(); i++) {
-        
+    obj_file.text_size = asm_lines.size() << 2;
+    for (unsigned int i = 0; i < asm_lines.size(); i++) {       
         obj_file.text_segment.push_back({ i << 2, 0, asm_lines.at(i) });
         LineAssembler line_assm(obj_file, i << 2);
         obj_file = line_assm.assemble();
@@ -217,10 +221,8 @@ void Assembler::pseudoConversion() {
             new_instructions.push_back({ "ori", tokens[1], tokens[1], C_lo });
         }
         else if (instruction == "la") {
-            string A_hi = intToBinaryString(stoi(tokens[2])).substr(0, 16);
-            string A_lo = intToBinaryString(stoi(tokens[2])).substr(16, 16);
-            new_instructions.push_back({ "lui", tokens[1], A_hi });
-            new_instructions.push_back({ "ori", tokens[1], tokens[1], A_lo });
+            new_instructions.push_back({ "lui", tokens[1], "str"});
+            new_instructions.push_back({ "ori", tokens[1], tokens[1], "str"});
         }
         else if (instruction == "b") {
             new_instructions.push_back({ "beq", "$zero", "$zero", tokens[1] });
