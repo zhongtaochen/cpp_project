@@ -1,4 +1,4 @@
-﻿#include "assembler.h"
+#include "assembler.h"
 #include "lineassembler.h"
 #include "sstream"
 #include "utils.h"
@@ -191,18 +191,14 @@ void Assembler::pseudoConversion() {
         asm_line = asm_lines.at(i);
         vector<string> tokens = split(asm_line, "[ \t,]+");
         string instruction = tokens.at(0);
-        //Format_Pseudo format = Pseudo_Bin.at(instruction);
         vector<vector<string>> new_instructions;
         if (instruction == "mul") {
             new_instructions.push_back({ "mult", tokens[2], tokens[3] });
             new_instructions.push_back({ "mflo", tokens[1] });
-            
         }
-        else if (instruction == "div"&& tokens[3].find("$") != tokens[3].npos) {
-        //else if (instruction == "div" && format.op3 != NONE) {
+        else if (instruction == "div" && tokens[3].find("$") != tokens[3].npos) {
             new_instructions.push_back({ "div", tokens[2], tokens[3] });
             new_instructions.push_back({ "mflo", tokens[1] });
-            
         }
         else if (instruction == "rem") {
             new_instructions.push_back({ "div", tokens[2], tokens[3] });
@@ -257,7 +253,7 @@ void Assembler::pseudoConversion() {
             new_instructions.push_back({ "ori", "$at", "$zero", tokens[2] });
             new_instructions.push_back({ "beq", tokens[1], "$at", tokens[3] });
         }
-        else if (instruction == "bne") {
+        else if (instruction == "bne" && tokens[2].find("$") == tokens[2].npos) {
             new_instructions.push_back({ "ori", "$at", "$zero", tokens[2] });
             new_instructions.push_back({ "bne", tokens[1], "$at", tokens[3] });
         }
@@ -285,15 +281,7 @@ void Assembler::pseudoConversion() {
         }
         insertConverted(asm_lines, i, new_instructions);
     }
-
-    //    for (unsigned int i = 0; i < asm_lines.size(); i++){
-    //        asm_line = asm_lines.at(i);
-    ////        cout << asm_line;
-    //        vector<string> tokens = split(asm_line, "[ \t,]+");
-    //        for (unsigned int j = 0; j < tokens.size(); j++){
-    //            cout << tokens[j] << endl;
-    //            cout << j << endl;
-    //        }
-    //    }
 }
+
+
 
