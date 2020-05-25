@@ -42,7 +42,24 @@ Linker::Linker(vector<ObjectFile> &obj_file_list) {
                     int sum = start_text_locat +reloc.address;
                     TextCell cell = exe_file.text_segment.at(sum>>2);
                     uint32_t mc_code_int  = cell.machine_code;
-                    if (reloc.instruction_type == "j" || reloc.instruction_type == "jal") { // J-type
+                    if (reloc.instruction_type == "lui") {
+                        /*cout << intToBinaryString(mc_code_int) << endl;
+                        std::cout << intToBinaryString(symbol_table.at(reloc.dependency)) << endl;
+                        std::cout << intToBinaryString(symbol_table.at(reloc.dependency) >> 16) << endl;*/
+                        mc_code_int |= ((symbol_table.at(reloc.dependency) >> 16));
+                        //std::cout << intToBinaryString(mc_code_int) << endl;
+                        //cout << "1" << endl;
+                        convertInstruction(exe_file.text_segment.at(sum >> 2).instruction, reloc.dependency, (symbol_table.at(reloc.dependency) >> 16));                     
+                    }
+                    else if (reloc.instruction_type == "ori") {
+                        //cout << intToBinaryString(mc_code_int) << endl;
+                        //std::cout << intToBinaryString(symbol_table.at(reloc.dependency)) << endl;
+                        //std::cout << intToBinaryString((symbol_table.at(reloc.dependency) & 0x0000ffff)) << endl;
+                        mc_code_int |= ((symbol_table.at(reloc.dependency) & 0x0000ffff));
+                        convertInstruction(exe_file.text_segment.at(sum >> 2).instruction, reloc.dependency, (symbol_table.at(reloc.dependency) & 0x0000ffff));
+                        //cout << intToBinaryString(mc_code_int) << endl;
+                        //cout << "1" << endl;
+                    }else if (reloc.instruction_type == "j" || reloc.instruction_type == "jal") { // J-type
                         mc_code_int &= 0xfc000000;
                         mc_code_int |= ((symbol_table.at(reloc.dependency) & (~0xf0000000))) >> 2;
                         

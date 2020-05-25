@@ -77,4 +77,6 @@ std::string combineString(std::vector<std::string> str);
  void insertConverted(std::vector<std::string> &str_vec, unsigned int pos,
     std::vector<std::vector<std::string>> vec_str_vec);
 
+ void convertInstruction(std::string &instruction, std::string var_name, unsigned int address);
+
 #endif // UTILS_H

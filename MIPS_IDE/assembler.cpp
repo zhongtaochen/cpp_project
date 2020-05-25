@@ -152,20 +152,22 @@ void Assembler::scanLabels() {
             obj_file.symbol_table.insert({ label, i<<2 });
             if (isEmptyLine(remain)) {
                 asm_lines.erase(asm_lines.begin()+i);
-                i--;
-            }
-            else {
+                i--;              
+            }else {
                 trim(remain);
                 asm_lines.at(i) = remain;
+                pseudoConversion(asm_line, i);
             }
+        }else {
+            pseudoConversion(asm_line, i);
         }
+       
     }
 }
 
 void Assembler::handleTextSection(const string &asm_text_sec) {
     preprocess(asm_text_sec);
     scanLabels();
-    pseudoConversion();
     obj_file.text_size = asm_lines.size() << 2;
     for (unsigned int i = 0; i < asm_lines.size(); i++) {       
         obj_file.text_segment.push_back({ i << 2, 0, asm_lines.at(i) });
@@ -184,11 +186,7 @@ void Assembler::output(const string& file_path) {
     writeFile(file_path, mc_code);
 }
  
-void Assembler::pseudoConversion() {
-    string asm_line;
-    for (unsigned int i = 0; i < asm_lines.size(); i++) {    
-        
-        asm_line = asm_lines.at(i);
+void Assembler::pseudoConversion(string asm_line, int i) {
         vector<string> tokens = split(asm_line, "[ \t,]+");
         string instruction = tokens.at(0);
         vector<vector<string>> new_instructions;
@@ -217,8 +215,8 @@ void Assembler::pseudoConversion() {
             new_instructions.push_back({ "ori", tokens[1], tokens[1], C_lo });
         }
         else if (instruction == "la") {
-            new_instructions.push_back({ "lui", tokens[1], "str"});
-            new_instructions.push_back({ "ori", tokens[1], tokens[1], "str"});
+            new_instructions.push_back({ "lui", tokens[1],tokens[2]});
+            new_instructions.push_back({ "ori", tokens[1], tokens[1], tokens[2]});
         }
         else if (instruction == "b") {
             new_instructions.push_back({ "beq", "$zero", "$zero", tokens[1] });
@@ -279,8 +277,7 @@ void Assembler::pseudoConversion() {
             new_instructions.push_back({ "divu", tokens[2], tokens[3] });
             new_instructions.push_back({ "mfhi", tokens[1] });
         }
-        insertConverted(asm_lines, i, new_instructions);
-    }
+        insertConverted(asm_lines, i, new_instructions);  
 }
 
 

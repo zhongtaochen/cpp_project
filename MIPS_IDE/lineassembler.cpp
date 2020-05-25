@@ -30,7 +30,18 @@ ObjectFile LineAssembler::assemble() {
 int LineAssembler::getOperandInt(OperandType op_type, const string &operand) {
     switch (op_type) {
         case RD: case RS: case RT: return getRegInt(operand);
-        case SA: case IMM: return stoi(operand);
+        case SA:  return stoi(operand);
+        case IMM: 
+           
+            if (isdigit(operand.at(0))||operand[0] == '-') {
+                return stoi(operand);
+            }else { // this part is designed just for "la" pseudo instruction
+                vector<string> tokens; string instruction;
+                tokens = split(asm_line, "[ \t,]+");
+                instruction = tokens.at(0);
+                obj_file.relocation_information.push_back({ address, instruction, operand });
+                return 0;
+            }             
         case LABEL:
             if (obj_file.symbol_table.count(operand)) {
                 return obj_file.symbol_table.at(operand);

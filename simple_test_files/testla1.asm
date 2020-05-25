@@ -8,7 +8,6 @@ str5: .asciiz "The grade is now:"				#at 0x005000A4
 str6: .asciiz "at address:"					#at 0x005000B8
 str7: .asciiz "of student:"					#at 0x005000C4
 
-
 .text
 main:	lui $a0, 80				#load str1 addr to $a0 and print.
 	addi $v0, $zero, 4
@@ -65,3 +64,12 @@ func:	addi $sp, $sp, -4
 	lui $t2, 80				#load the start of the grade array into $t2
 	ori $t2, $t2, 124
 	addi $t3, $zero, 1			#put loop counter in $t3
+loop:	beq $t0, $t3, end
+	addi $t2,$t2, 4
+	addi $t3, $t3, 1			#increment $t3
+	j loop
+end:	sw $t1, 0($t2)				#put grade in place
+	add $v1, $t2, $zero			#return the address of the changed grade
+	lw $v0, 0($sp)				#restore original $v0
+	addi $sp, $sp, 4
+	jr $ra

@@ -7,6 +7,8 @@
 #include <bitset>
 using namespace std;
 
+
+
 string fileToString(const ifstream &file) {
     stringstream buffer;
     buffer << file.rdbuf();
@@ -61,12 +63,12 @@ string intToBinaryString(int machine_code_int) {
 
 
 string combineString(vector<string> str) {
-    string combined;
-    for (unsigned int i = 0; i < str.size(); i++) {
+    string combined = str[0]+" ";
+    for (unsigned int i = 1; i < str.size()-1; i++) {
         combined += str[i];
-        combined += " ";
+        combined += ", ";
     }
-    combined.erase(combined.find_last_not_of(" ") + 1);
+    combined += str[str.size() -1];
     return combined;
 }
 
@@ -86,5 +88,13 @@ void insertConverted(vector<string> &str_vec, unsigned int pos,
             str_vec.insert(str_vec.begin() + pos + i, temp);
         }
     }
+}
+
+void convertInstruction(string &instruction,string var_name,unsigned int address) {
+    int var_pos = instruction.find(var_name);
+    stringstream sstrm;
+    sstrm << std::dec << address;
+    instruction = instruction.substr(0, var_pos) + sstrm.str();
+
 }
 
