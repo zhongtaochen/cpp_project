@@ -24,7 +24,7 @@ la $a0, str1
 li $v0, 4
 syscall # print_string str1
 
-addi $a0, $v0, -100
+addi $a0, $0, -100
 abs $a0, $a0
 li $v0, 1
 syscall # print_int 100

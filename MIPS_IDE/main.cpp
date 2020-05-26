@@ -29,7 +29,7 @@ int main() {
     //    }
     //}
     //cout << "1" << endl;
-    std::ifstream file = readFile("C:\\Users\\quyah\\Desktop\\cpp_project\\New Folder\\cpp_project\\simple_test_files\\testla.asm");
+    std::ifstream file = readFile("C:\\Users\\quyah\\Desktop\\cpp_project\\New Folder\\cpp_project\\simple_test_files\\pseudo_test.asm");
     Assembler assm(file);
     std::vector<ObjectFile> obj_file_list = { assm.getObjFile()}; 
     Linker linker(obj_file_list);
