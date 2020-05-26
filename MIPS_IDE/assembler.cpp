@@ -209,10 +209,12 @@ void Assembler::pseudoConversion(string asm_line, int i) {
             new_instructions.push_back({ "or", tokens[1], "$zero", "$zero" });
         }
         else if (instruction == "li") {
-            string C_hi = intToBinaryString(stoi(tokens[2])).substr(0, 16);
-            string C_lo = intToBinaryString(stoi(tokens[2])).substr(16, 16);
-            new_instructions.push_back({ "lui", tokens[1], C_hi });
-            new_instructions.push_back({ "ori", tokens[1], tokens[1], C_lo });
+            stringstream sstrm1;
+            stringstream sstrm2;
+            sstrm1 << std::dec << (stoi(tokens[2])&0xffff0000);
+            sstrm2 << std::dec << (stoi(tokens[2]) & 0x0000ffff);
+            new_instructions.push_back({ "lui", tokens[1], sstrm1.str()});
+            new_instructions.push_back({ "ori", tokens[1], tokens[1], sstrm2.str() });
         }
         else if (instruction == "la") {
             new_instructions.push_back({ "lui", tokens[1],tokens[2]});
