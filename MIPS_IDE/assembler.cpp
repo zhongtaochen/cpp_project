@@ -2,6 +2,7 @@
 #include "lineassembler.h"
 #include "sstream"
 #include "utils.h"
+#include <iostream>
 using namespace std;
 
 Assembler::Assembler(const ifstream &asm_file) :
@@ -211,7 +212,8 @@ void Assembler::pseudoConversion(string asm_line, int i) {
         else if (instruction == "li") {
             stringstream sstrm1;
             stringstream sstrm2;
-            sstrm1 << std::dec << (stoi(tokens[2])&0xffff0000);
+            //std::cout << (stoi("4294901760")) << endl;
+            sstrm1 << std::dec << ((stoi(tokens[2])&0xffff0000)>>16);
             sstrm2 << std::dec << (stoi(tokens[2]) & 0x0000ffff);
             new_instructions.push_back({ "lui", tokens[1], sstrm1.str()});
             new_instructions.push_back({ "ori", tokens[1], tokens[1], sstrm2.str() });
