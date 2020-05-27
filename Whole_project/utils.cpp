@@ -1,11 +1,26 @@
 #include "utils.h"
-#include <sstream>
+#include "assembler.h"
 #include <iostream>
+#include <sstream>
 #include <regex>
 #include <iomanip>
+#include <bitset>
+
 using namespace std;
 
-string fileToString(ifstream &file) {
+
+QStringList textseg_to_Qstring(std::vector<TextCell> text_seg){
+    QStringList resultlist;
+    for (auto const& pair : text_seg) {
+        QString instrctn = QString::fromStdString(pair.instruction);
+        QString addr = QString::fromStdString(intToBinaryString(pair.address));
+        resultlist.append(QString("%1 %2").arg(addr,instrctn));
+    }
+    return resultlist;
+}
+
+
+string fileToString(const ifstream &file) {
     stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
@@ -45,10 +60,6 @@ vector<string> split(const string &s, const string &delim) {
     return tokens;
 }
 
-string intToBinaryString(int machine_code_int) {
-    return bitset<32>(machine_code_int).to_string();
-}
-
 string intToHexString(unsigned int num) {
     stringstream sstrm;
     sstrm << "0x"
@@ -57,43 +68,44 @@ string intToHexString(unsigned int num) {
     return sstrm.str();
 }
 
-void error(string msg) {
-    cerr << msg << endl;
-    exit(EXIT_FAILURE);
+string intToBinaryString(int machine_code_int) {
+    return bitset<32>(machine_code_int).to_string();
 }
 
-bool isBinaryString(string str, unsigned int digits) {
-    return str.length() == digits && regex_match(str, regex("^[01]+$"));
-}
 
-unsigned long binaryStringToInt(const string &str) {
-    bitset<32> bs(str);
-    return bs.to_ulong();
-}
-
-string combineString(vector<string> str){
-    string combined;
-    for (unsigned int i = 0; i < str.size(); i++){
+string combineString(vector<string> str) {
+    string combined = str[0]+" ";
+    for (unsigned int i = 1; i < str.size()-1; i++) {
         combined += str[i];
-        combined += " ";
+        combined += ", ";
     }
-    combined.erase(combined.find_last_not_of(" ") + 1);
+    combined += str[str.size() -1];
     return combined;
 }
 
-vector<string> insertConverted(vector<string> str_vec, unsigned int pos,
-                               vector<vector<string>> vec_str_vec){
-                               //new_instruction_1, vector<string> new_instruction_2, vector<string> new_instruction_3){
-    if (!vec_str_vec[0].empty()){
+void insertConverted(vector<string> &str_vec, unsigned int pos,
+    vector<vector<string>> vec_str_vec) {
+    if (vec_str_vec.size() == 0) {
+        return;
+    }
+    //new_instruction_1, vector<string> new_instruction_2, vector<string> new_instruction_3){
+    if (!vec_str_vec[0].empty()) {
         string temp_1 = combineString(vec_str_vec[0]);
         str_vec[pos] = temp_1;
-        }
-    for (unsigned int i = 1; i < vec_str_vec.size(); i++){
-        if (!vec_str_vec[i].empty()){
-            string temp = combineString(vec_str_vec[i]);
-            str_vec.insert(str_vec.begin()+pos+i, temp);
-            }
     }
-    return str_vec;
+    for (unsigned int i = 1; i < vec_str_vec.size(); i++) {
+        if (!vec_str_vec[i].empty()) {
+            string temp = combineString(vec_str_vec[i]);
+            str_vec.insert(str_vec.begin() + pos + i, temp);
+        }
+    }
+}
+
+void convertInstruction(string &instruction,string var_name,unsigned int address) {
+    int var_pos = instruction.find(var_name);
+    stringstream sstrm;
+    sstrm << std::dec << address;
+    instruction = instruction.substr(0, var_pos) + sstrm.str();
+
 }
 
