@@ -9,7 +9,6 @@ div_: .asciiz "Testing div ..."
 divu_: .asciiz "Testing divu ..."
 mult_: .asciiz "Testing mult ..."
 multu_: .asciiz "Testing multu ..."
-mul_: .asciiz "Testing mul ..."
 nor_: .asciiz "Testing nor ..."
 or_: .asciiz "Testing or ..."
 ori_: .asciiz "Testing ori ..."
@@ -144,17 +143,6 @@ mfhi $s3
 bne $s3, 0, fail
 mflo $s3
 bne $s3, 3, fail
-
-
-test_mul:
-la $a0, mul_
-li $v0, 4
-syscall
-
-li $s1, -10
-li $s2, -10
-mul $s3, $s1, $s2
-bne $s3, 100, fail
 
 
 test_nor:
