@@ -12,11 +12,11 @@ using namespace std;
  */
 
 ObjectFile J_LineAssembler::assemble() {
-    uint32_t machine_code_int = 0;
-    machine_code_int |= (op << 26);
-    machine_code_int |= target;
-    obj_file.text_segment.at(address >> 2).machine_code = machine_code_int;
-    return obj_file;
+	uint32_t machine_code_int = 0;
+	machine_code_int |= (op << 26);
+	machine_code_int |= target;
+	obj_file.text_segment.at(address >> 2).machine_code = machine_code_int;
+	return obj_file;
 }
 
 /**
@@ -24,16 +24,16 @@ ObjectFile J_LineAssembler::assemble() {
  * No operand handling. Immediately fill the relocation information.
  */
 J_LineAssembler::J_LineAssembler(string asm_line, ObjectFile obj_file, uint32_t address) {
-    this->asm_line = asm_line;
-    this->obj_file = obj_file;
-    this->address = address;
+	this->asm_line = asm_line;
+	this->obj_file = obj_file;
+	this->address = address;
 
-    vector<string> tokens = split(asm_line, "[ \t,]+");
-    string instruction = tokens.at(0);
-    Format format = J_BIN.at(instruction);
-    op = format.id; target = 0;
+	vector<string> tokens = split(asm_line, "[ \t,]+");
+	string instruction = tokens.at(0);
+	Format format = J_BIN.at(instruction);
+	op = format.id; target = 0;
 
-    this->obj_file.relocation_information.push_back({address, instruction, tokens.at(1)});
+	this->obj_file.relocation_information.push_back({ address, instruction, tokens.at(1) });
 }
 
-void J_LineAssembler::handleOperand(OperandType op_type, const std::string &op){};
+void J_LineAssembler::handleOperand(OperandType op_type, const std::string& op) {};
