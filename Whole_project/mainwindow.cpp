@@ -251,11 +251,17 @@ void MainWindow::setTextSegment() {
 	TextSegment->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	TextSegment->horizontalHeader()->setStretchLastSection(true);
 	TextSegment->setShowGrid(false);
-	QString textEditPlainText = textEdit->document()->toPlainText();
-	Assembler assm;
-	assm.assemble(textEditPlainText.toStdString());
-
-	obj_file_list = { assm.getObjFile() };
+    if (fileNames.isEmpty()) {
+        QMessageBox::about(this, tr("About Run"),
+            tr("Please check if you have opened any file or you have saved the file"));
+        return;
+    }
+    for (QString file_name : fileNames) {
+        std::ifstream file = readFile(file_name.toStdString());
+        Assembler assm;
+        assm.assemble(file);
+        obj_file_list.push_back(assm.getObjFile());
+    }
 	linker.link(obj_file_list);
 	ExecutableFile exe_file = linker.getExecutableFile();
 	debugger.debug(&exe_file);
