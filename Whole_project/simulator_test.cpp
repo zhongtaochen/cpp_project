@@ -7,6 +7,7 @@
 #include "simulator.h"
 #include <assert.h>
 
+
 /**
  * @brief Simple unit tests for <code>MemorySimulator</code> class.
  * @details Cover all core methods and special handling for out-of-bound situation.

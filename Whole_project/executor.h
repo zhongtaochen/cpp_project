@@ -11,7 +11,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
-
+#include <QTextStream>
 class MemorySimulator;
 class RegisterFilesSimulator;
 class TestExecutor;

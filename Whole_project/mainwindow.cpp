@@ -95,7 +95,7 @@ void MainWindow::open()
         }
         if (fileNames.size()){
             for (int i=0;i<fileNames.size();i++){
-                qDebug()<<"fileNames after add"<<i<<fileNames.at(i);
+                //qDebug()<<"fileNames after add"<<i<<fileNames.at(i);
             }
         }
         if (!addFileNames.isEmpty()){
@@ -110,7 +110,7 @@ void MainWindow::removeFromList(int k){
     fileNames.removeAt(k);
     if (fileNames.size()){
         for (int i=0;i<fileNames.size();i++){
-            qDebug()<<"fileNames after remove"<<i<<fileNames.at(i);
+            //qDebug()<<"fileNames after remove"<<i<<fileNames.at(i);
         }
     }
 }
@@ -204,8 +204,11 @@ void MainWindow::about()
                "toolbars, and a status bar."));
 }
 
+
+#include "executor.h"
 void MainWindow::run()
 {
+
     if(fileNames.isEmpty()){
         QMessageBox::about(this, tr("About Run"),
                  tr("Please check if you have opened any file or you have saved the file"));
@@ -249,7 +252,7 @@ void MainWindow::setTextSegment(){
         QTableWidgetItem *item0=new QTableWidgetItem(tmp);
         item0->setCheckState(Qt::Unchecked);
         TextSegment->setItem(i,0,item0);}
-    connect(TextSegment, SIGNAL(cellChanged(int,int)), this, SLOT(changeBreakpoints(int, int)));
+
     TextSegment->viewport()->update();
 
 }
@@ -272,6 +275,7 @@ void MainWindow::setAutos(){
 void MainWindow::debug(){
     setTextSegment();
     QMessageBox::about(this, tr("About Debug"),tr("Now you need to set breakpoints(●'◡'●)"));
+    connect(TextSegment, SIGNAL(cellChanged(int,int)), this, SLOT(changeBreakpoints(int, int)));
 }
 
 void MainWindow::to_next_breakpoint(){
@@ -289,17 +293,19 @@ void MainWindow::step(){
     }else{
         curr_row+=1;
         debugger.step();
-        std::string message = "We are at the "+std::to_string(curr_row)+"th row";
+        std::string message = "We are at the "+std::to_string(curr_row+1)+"th row";
         QMessageBox::about(this, tr("About to_next_breakpoint"),tr(message.c_str()));
     }
 }
 
 void MainWindow::changeBreakpoints(int row, int col){
-     QString addr = TextSegment->itemAt(row,0)->text();
+
+     QString addr = TextSegment->item(row,0)->text();
      uint32_t address = stoi(addr.left(32).toStdString(),0,2);
      if(TextSegment->item(row, col)->checkState() == Qt::Checked){
          debugger.addBreakpoint(address);
          breakpoints.push_back(row);
+
          std::sort(breakpoints.begin(),prev(breakpoints.end()));
 
      }else{

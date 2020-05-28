@@ -6,7 +6,8 @@
 
 #include "simulator.h"
 #include <iostream>
-
+#include <QTextStream>
+QTextStream ccerr(stderr,  QIODevice::WriteOnly);
 MemorySimulator::MemorySimulator(unsigned int num_of_bytes) {
     this->mem_arr = new uint8_t[num_of_bytes];
     this->__end_address = __start_address + num_of_bytes - 1;
@@ -48,7 +49,7 @@ uint32_t MemorySimulator::getEndAddress() {
 
 unsigned int MemorySimulator::toIndex(uint32_t address) {
     if (address < __start_address || address > __end_address) {
-        std::cerr << "Memory address out of bound. Abort." << std::endl;
+        ccerr << "Memory address out of bound. Abort." << endl;
         exit(0);
     }
     return address - __start_address;
@@ -77,7 +78,7 @@ uint32_t& RegisterFilesSimulator::operator[](unsigned int id) {
 
 void RegisterFilesSimulator::checkValid(unsigned int id) {
     if (id >= 34) {
-        std::cerr << "Register files id out of bound. Abort." << std::endl;
+        ccerr << "Register files id out of bound. Abort." << endl;
         exit(0);
     }
 }

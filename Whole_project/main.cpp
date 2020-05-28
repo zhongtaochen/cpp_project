@@ -11,64 +11,66 @@
 using namespace std;
 #include "finddialog.h"
 #include "mainwindow.h"
+#include <QTextStream>
 
 
-int main(int argc, char *argv[])
-{
-    Q_INIT_RESOURCE(application);
-    QApplication app(argc, argv);
 
-    //QCoreApplication app(argc, argv);
-    MainWindow mainWin;
-    mainWin.resize(1000, 600);
-    mainWin.show();
-    return app.exec();
 
-//    ExecutableFile exe_file;
-//    exe_file.text_size = 24;
-//    exe_file.text_segment = {
-//        {0x00400000, 0x00400000, "Breakpoint 0x00400000"},
-//        {0x00400004, 0x00400004, "Breakpoint 0x00400004"},
-//        {0x00400008, 0x00400008, "Breakpoint 0x00400008"},
-//        {0x0040000c, 0x0040000c, "Breakpoint 0x0040000c"},
-//        {0x00400010, 0x00400010, "Breakpoint 0x00400010"},
-//        {0x00400014, 0x00400014, "Breakpoint 0x00400014"}
-//    };
-//    exe_file.data_size = 8;
-//    exe_file.data_segment = {
-//        {0x00500000, 0x00001010},
-//        {0x00500004, 0x00001010}
-//    };
+//int main(int argc, char *argv[])
+//{
 
-//    /** Core Methods */
-//    Debugger debugger(&exe_file);
-//    debugger.addBreakpoint(0x00400000);
-//    debugger.addBreakpoint(0x00400008);
-//    assert(debugger.run() == 0x00400000);
-//    std::cout << "Expected:\n\n" << std::endl;
-//    assert(debugger.run() == 0x00400008);
-//    std::cout << "Expected:\n0x00400000\n0x00400004\n" << std::endl;
-//    assert(debugger.step() == 0x0040000c);
-//    std::cout << "Expected:\n0x00400008\n" << std::endl;
-//    debugger.addBreakpoint(0x00400010);
-//    debugger.addBreakpoint(0x00400014);
-////    debugger.removeBreakpoint(0x00400010);
-//    assert(debugger.run() == 0x00400010);
-//    std::cout << "Expected:\n0x0040000c\n0x00400010\n" << std::endl;
-//    std::cout<<"keyyi"<<endl;
 
-//    Debugger debugger2(&exe_file);
-//    debugger2.addBreakpoint(0x00400008);
-//    assert(debugger2.run() == 0x00400008);
-//    std::cout << "Expected:\n0x00400000\n0x00400004\n" << std::endl;
-//    return 0;
-
-}
-
-//int main(int argc, char *argv[]){
 //    Q_INIT_RESOURCE(application);
 //    QApplication app(argc, argv);
+
+
 //    MainWindow mainWin;
 //    mainWin.resize(1000, 600);
+//    mainWin.show();
+//    return app.exec();
 //    return 0;
+
 //}
+
+
+
+
+
+
+
+
+//#include <QApplication>
+//#include <QTextStream>
+//#include <QDebug>
+
+//int main(int argc, char *argv[])
+//{
+//    QApplication a(argc, argv);
+//    QTextStream out(stdout);//显示数据
+//    QTextStream in(stdin);//获取数据
+//    out<<"input"<<endl;
+//    QString str;
+
+//    in>>str;
+
+
+//    out << str << endl;
+
+//    return a.exec();
+//}
+
+int main(){
+    std::ifstream file = readFile("C:\\Users\\quyah\\Desktop\\cpp_project\\New Folder\\cpp_project\\simple_test_files\\fibonacci.asm");
+    Assembler assm;
+    assm.assemble(file);
+    std::vector<ObjectFile> obj_file_list = { assm.getObjFile()};
+    Linker linker;
+    linker.link(obj_file_list);
+    ExecutableFile exe_file =  linker.getExecutableFile();
+    Loader loader;
+    loader.load(&exe_file);
+    Simulator simulator(loader.getMemorySimulator(), loader.getRegisterFilesSimulator());
+    simulator.run();
+    return 0;
+}
+

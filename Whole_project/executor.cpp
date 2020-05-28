@@ -8,11 +8,17 @@
 #include <iostream>
 #include <iomanip>
 #include "fstream"
+#include <QTextStream>
+
+QTextStream ccout(stdout);
+QTextStream ccin(stdin);
+
+
+
 
 void trap(uint32_t pc, std::string msg);
 
 uint32_t Executor::execute(uint32_t instruction) {
-//    std::cout << std::hex << instruction << std::endl;
     pc += 4;
 
     uint32_t opcode = instruction >> 26;
@@ -188,25 +194,25 @@ uint32_t Executor::execute(uint32_t instruction) {
 
 void Executor::syscall() {
     if ((*reg)[2] == 1) { // print_int
-        std::cout << (int)(*reg)[4] << std::endl;
+        ccout << (int)(*reg)[4] << endl;
     } else if ((*reg)[2] == 4) { // print_string
         uint32_t address = (*reg)[4];
         char curr_char = mem->readByte(address);
         while (curr_char) {
-            std::cout << curr_char;
+            ccout << curr_char;
             curr_char = mem->readByte(++address);
         }
-        std::cout << std::endl;
+        ccout << endl;
     } else if ((*reg)[2] == 5) { // read_int
         int32_t in;
-        std::cin >> in;
+        ccin >> in;
         reg->writeReg(2, in);
     } else if ((*reg)[2] == 8) { // read_string
         uint32_t address = (*reg)[4];
         uint32_t length = (*reg)[5];
         char curr_char;
         for (uint32_t i = 0; i < length; i++) {
-            std::cin >> curr_char;
+            ccin >> curr_char;
             mem->writeByte(address+i, curr_char);
         }
     } else if ((*reg)[2] == 9) { // sbrk
@@ -216,10 +222,10 @@ void Executor::syscall() {
     } else if ((*reg)[2] == 10) { // exit
         exit(0);
     } else if ((*reg)[2] == 11) { // print_char
-        std::cout << (char) (*reg)[4] << std::endl;
+        ccout << (char) (*reg)[4] << endl;
     } else if ((*reg)[2] == 12) { // read_char
         char in;
-        std::cin >> in;
+        ccin >> in;
         reg->writeReg(2, in);
     } else if ((*reg)[2] == 13) { // open
         uint32_t address = (*reg)[4];
@@ -268,9 +274,13 @@ void Executor::syscall() {
  * @brief Trap exception. Print address of the exception and detailed information.
  * Furthermore, the program will be aborted.
  */
+#include <sstream>
+#include <QString>
 void trap(uint32_t pc, std::string msg) {
-    std::cout << "Address: 0x" << std::setw(8) << std::setfill('0')
-              << std::hex << pc << std::endl;
-    std::cout << msg << std::endl;
+    std::stringstream sstrm;
+    sstrm<<"Address: 0x" << std::setw(8) << std::setfill('0')
+        << std::hex << pc;
+    ccout << QString::fromStdString(sstrm.str())<<endl;
+    ccout << QString::fromStdString(msg)<< endl;
     exit(1);
 }
