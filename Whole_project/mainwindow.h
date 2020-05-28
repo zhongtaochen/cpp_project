@@ -59,19 +59,35 @@ private slots:
 	bool saveAs();
 	void find();
 	void about();
+    void removeFromList(int k);
+    void changeTo(int currentFile);
+    /**
+     * @brief Run the .asm file
+     */
 	void run();
+    /**
+     * @brief Initialize the debugger and set text segment.
+     */
 	void debug();
 	void documentWasModified();
+    /**
+     * @brief Set or remove breakpoints at (row, col).
+     */
 	void changeBreakpoints(int row, int col);
-	void removeFromList(int k);//改动了！！！！！
+    /**
+     * @brief Fill the TextSegment with machinecodes and mips instructions.
+     */
 	void setTextSegment();
+    /**
+     * @brief Show values of registers in the interface.
+     */
 	void setAutos();
+    /**
+     * @brief Run the codes to the next break point.
+     */
 	void to_next_breakpoint();
 
 	/**
-	 * Method: step
-	 * Usage: step();
-	 * ------------------------------
 	 * @brief step to the next line of execution.
 	 */
 	void step();

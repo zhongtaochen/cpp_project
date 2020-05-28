@@ -49,8 +49,9 @@ MainWindow::MainWindow()
 	setUnifiedTitleAndToolBarOnMac(true);
 
 	QStringList fileNames;
-	//改了！！！
-	connect(fileList, SIGNAL(removeFrom(int)), this, SLOT(removeFromList(int)));
+    connect(fileList,SIGNAL(removeFrom(int)),this,SLOT(removeFromList(int)));
+
+    connect(fileList,SIGNAL(changeToFile(int)),this,SLOT(changeTo(int)));
 }
 
 
@@ -73,45 +74,60 @@ void MainWindow::newFile()
 	}
 }
 
-//这整个函数改动了！
 void MainWindow::open()
-{
-	if (maybeSave()) {
-		QStringList addFileNames = QFileDialog::getOpenFileNames(this);
-
-		for (int i = 0; i < addFileNames.size(); i++) {
-			if (!fileNames.contains(addFileNames.at(i))) {
-				fileNames.push_back(addFileNames.at(i));
-			}
-			else {
-				if (addFileNames.size() == 1) {
-					addFileNames.clear();
-				}
-				else {
-					addFileNames.removeAt(i);
-				}
-			}
-		}
-		if (fileNames.size()) {
-			for (int i = 0; i < fileNames.size(); i++) {
-
-			}
-		}
-		if (!addFileNames.isEmpty()) {
-			QString fileName = addFileNames.at(0);
-			loadFile(fileName);
-			emit tryUpdate(addFileNames);
-		}
-	}
+{   //ask whether to save the current file or not
+    if (maybeSave()) {
+        //get the filenames of chosen files,keep them in a QtringList:addFileNames.
+        QStringList addFileNames = QFileDialog::getOpenFileNames(this);
+        //for each filename in addFileNames
+        for (int i=0;i<addFileNames.size();i++){
+            //if it is not in fileNamse,add it into fileNames.
+            if (!fileNames.contains(addFileNames.at(i))){
+                fileNames.push_back(addFileNames.at(i));
+            }
+            //if it is in fileNames,remove it from addFileNames.
+            else{
+                if (addFileNames.size()==1){
+                    addFileNames.clear();
+                }else{
+                    addFileNames.removeAt(i);
+                }
+            }
+        }
+        //if there are filenames in addFileNames,present the first of them in the codeEditor
+        //emit the signal to update the file list
+        if (!addFileNames.isEmpty()){
+            QString fileName=addFileNames.at(0);
+            loadFile(fileName);
+        emit tryUpdate(addFileNames);
+        }
+    }
 }
 
-void MainWindow::removeFromList(int k) {
-	fileNames.removeAt(k);
-	if (fileNames.size()) {
-		for (int i = 0; i < fileNames.size(); i++) {
-			//qDebug()<<"fileNames after remove"<<i<<fileNames.at(i);
-		}
-	}
+
+void MainWindow::removeFromList(int k){
+    //remove the file from fileNames
+    if (fileNames.size()>1){
+        fileNames.removeAt(k);
+    }else{
+        fileNames.clear();
+    }
+    //if there are files left in fileNames, present the first of them
+    if (!fileNames.isEmpty()){
+        QString fileName=fileNames.at(0);
+        loadFile(fileName);
+    //if there is no file left in fileNames,clear the codeEditor
+    }else{
+        textEdit->clear();
+    }
+}
+
+void MainWindow::changeTo(int currentFile)
+{
+    if (QString::compare(curFile,fileNames.at(currentFile),Qt::CaseInsensitive)!=0){
+        QString fileName=fileNames.at(currentFile);
+        loadFile(fileName);
+    }
 }
 
 bool MainWindow::save()
@@ -169,13 +185,11 @@ void MainWindow::search(const QString& str)
 		cursor.beginEditBlock();
 
 		while (!highlight_cursor.isNull() && !highlight_cursor.atEnd()) {
-			//查找指定的文本，匹配整个单词
 			highlight_cursor = document->find(search_text, highlight_cursor);//, QTextDocument::FindWholeWords
 			if (!highlight_cursor.isNull()) {
 				found = true;
 				highlight_cursor.movePosition(QTextCursor::WordRight,
 					QTextCursor::KeepAnchor);
-				//highlight_cursor.mergeCharFormat(colorFormat);
 				setAutoFillBackground(true);
 				QTextCharFormat fmt = highlight_cursor.charFormat();
 				fmt.setBackground(Qt::yellow);
@@ -184,7 +198,6 @@ void MainWindow::search(const QString& str)
 		}
 		cursor.endEditBlock();
 		isFirstTime = false;
-		//结束
 		if (found == false) {
 			QMessageBox::information(this, tr("Word not found"), tr("Sorry,the word cannot be found."));
 		}
@@ -193,7 +206,6 @@ void MainWindow::search(const QString& str)
 
 void MainWindow::clear()
 {
-	//QMessageBox::information(this, tr("Word not found"),tr("Clearing."));
 	textEdit->undo();
 }
 
@@ -304,18 +316,16 @@ void MainWindow::step() {
 
 void MainWindow::changeBreakpoints(int row, int col) {
 
-	QString addr = TextSegment->item(row, 0)->text();
+    QString addr = TextSegment->item(row, 0)->text();
 	uint32_t address = stoi(addr.left(32).toStdString(), 0, 2);
 	if (TextSegment->item(row, col)->checkState() == Qt::Checked) {
 		debugger.addBreakpoint(address);
 		breakpoints.push_back(row);
-
 		std::sort(breakpoints.begin(), prev(breakpoints.end()));
-
 	}
 	else {
 		debugger.removeBreakpoint(address);
-		std::vector<int>::iterator iter = std::find(breakpoints.begin(), breakpoints.end(), 3);
+        std::vector<int>::iterator iter = std::find(breakpoints.begin(), breakpoints.end(), row);
 		breakpoints.erase(iter);
 	}
 }
@@ -326,35 +336,22 @@ void MainWindow::documentWasModified()
 }
 
 void MainWindow::createActions()
-{   //从这里开始是菜单栏中第一个QMenu——fileMenu
-	QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
-	//创建一个QMenu窗口部件，并添加到菜单栏中
+{
+    //fileMenu
+	QMenu* fileMenu = menuBar()->addMenu(tr("&File"));	
 	QToolBar* fileToolBar = addToolBar(tr("File"));
-	//创建一个QToolBar窗口部件，并添加到工具栏中
-
-
 	const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
-	//可以从系统主题中获取图标，在主题中找不到图标时，再使用自己定义的图标
 	QAction* newAct = new QAction(newIcon, tr("&New"), this);
-	//创建动作newAct
 	newAct->setShortcuts(QKeySequence::New);
-	//设置newAct的快捷键,QKeySequence::StandardKey
 	newAct->setStatusTip(tr("Create a new file"));
-	//设置newAct的状态提示
 	connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
-	//把newAct这个动作的triggered()信号连接到mainwindow的private slot——newFile
-	//确保用户在选择File->New菜单项，选择工具栏上的New按钮，或者按下快捷键的时候，可以调用newFile槽
 	fileMenu->addAction(newAct);
-	//把动作newAct添加到菜单fileMenu上
 	fileToolBar->addAction(newAct);
-	//把动作newAct添加到工具栏fileToolBar上
-
 	const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(":/images/open.png"));
 	QAction* openAct = new QAction(openIcon, tr("&Open..."), this);
 	openAct->setShortcuts(QKeySequence::Open);
 	openAct->setStatusTip(tr("Open an existing file"));
 	connect(openAct, &QAction::triggered, this, &MainWindow::open);
-	//下面这一句改动了！！！！！！
 	connect(this, SIGNAL(tryUpdate(QStringList)), fileList, SLOT(updateList(QStringList)));
 	fileMenu->addAction(openAct);
 	fileToolBar->addAction(openAct);
@@ -379,7 +376,7 @@ void MainWindow::createActions()
 	exitAct->setShortcuts(QKeySequence::Quit);
 	exitAct->setStatusTip(tr("Exit the application"));
 
-	//从这里开始是菜单栏中第二个QMenu——editMenu
+    // editMenu
 	QMenu* editMenu = menuBar()->addMenu(tr("&Edit"));
 	QToolBar* editToolBar = addToolBar(tr("Edit"));
 
@@ -424,7 +421,7 @@ void MainWindow::createActions()
 
 #endif
 
-	//从这里开始是菜单栏中第三个QMenu——runMenu
+    //runMenu
 	QMenu* runMenu = menuBar()->addMenu(tr("&Run"));
 	QToolBar* runToolBar = addToolBar(tr("Run"));
 
@@ -436,7 +433,7 @@ void MainWindow::createActions()
 	runMenu->addAction(runAct);
 	runToolBar->addAction(runAct);
 
-	//从这里开始是菜单栏中第四个QMenu——debugMenu
+    //debugMenu
 	QMenu* debugMenu = menuBar()->addMenu(tr("&Debug"));
 	QToolBar* debugToolBar = addToolBar(tr("Debug"));
 
@@ -467,9 +464,6 @@ void MainWindow::createActions()
 	QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
 	QAction* aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
 	aboutAct->setStatusTip(tr("Show the application's About box"));
-
-	//    QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
-	//    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
 
 #ifndef QT_NO_CLIPBOARD
 
@@ -576,18 +570,17 @@ bool MainWindow::saveFile(const QString& fileName)
 	return true;
 }
 
-void MainWindow::setCurrentFile(const QString& fileName)
+void MainWindow::setCurrentFile(const QString &fileName)
 {
-	curFile = fileName;
-	textEdit->document()->setModified(false);
-	setWindowModified(false);
+    curFile = fileName;
+    textEdit->document()->setModified(false);
+    setWindowModified(false);
 
-	QString shownName = curFile;
-	if (curFile.isEmpty())
-		shownName = "untitled.txt";
-	setWindowFilePath(shownName);
+    QString shownName = curFile;
+    if (curFile.isEmpty())
+        shownName = "untitled.txt";
+    setWindowFilePath(shownName);
 }
-
 QString MainWindow::strippedName(const QString& fullFileName)
 {
 	return QFileInfo(fullFileName).fileName();
