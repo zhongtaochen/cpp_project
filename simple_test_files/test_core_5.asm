@@ -2,6 +2,8 @@
 sb_lb_lbu_: .asciiz "Testing sb, lb, lbu ..."
 sh_lh_lhu: .asciiz "Testing sh, lh, lhu ..."
 sw_lw_: .asciiz "Testing sw, lw ..."
+mfhi_mthi_: .asciiz "Testing mfhi, mthi ..."
+mflo_mtlo_: .asciiz "Testing mflo, mtlo ..."
 pass_: .asciiz "Tests all passed."
 fail_: .asciiz "Test fails."
 
@@ -52,6 +54,28 @@ sw $s0, 0($t0)
 
 lw $s0, 0($t0)
 bne $s0, -1, fail
+
+
+test_mfhi_mthi:
+la $a0, mfhi_mthi_
+li $v0, 4
+syscall
+
+li $s0, -1
+mthi $s0
+mfhi $s1
+bne $s1, -1, fail
+
+
+test_mflo_mtlo:
+la $a0, mflo_mtlo_
+li $v0, 4
+syscall
+
+li $s0, -1
+mtlo $s0
+mflo $s1
+bne $s1, -1, fail
 
 
 exit:
