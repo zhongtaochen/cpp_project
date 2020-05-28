@@ -15,32 +15,32 @@
 #include <vector>
 #include <map>
 
-/**
- * @brief Basic unit for text segment in both <code>ObjectFile</code> and
- * <code>ExecutableFile</code> class.
- */
-struct TextCell{
-    uint32_t address;
-    uint32_t machine_code;
-    std::string instruction;
+ /**
+  * @brief Basic unit for text segment in both <code>ObjectFile</code> and
+  * <code>ExecutableFile</code> class.
+  */
+struct TextCell {
+	uint32_t address;
+	uint32_t machine_code;
+	std::string instruction;
 };
 
 /**
  * @brief Basic unit for data segment in both <code>ObjectFile</code> and
  * <code>ExecutableFile</code> class.
  */
-struct DataCell{
-    uint32_t address;
-    uint32_t data;
+struct DataCell {
+	uint32_t address;
+	uint32_t data;
 };
 
 /**
  * @brief Basic unit for relocation information in <code>ObjectFile</code>.
  */
-struct RelocationCell{
-    uint32_t address;
-    std::string instruction_type;
-    std::string dependency;
+struct RelocationCell {
+	uint32_t address;
+	std::string instruction_type;
+	std::string dependency;
 };
 
 /**
@@ -51,19 +51,19 @@ class ObjectFile {
 
 public:
 
-/**
- * @brief Void initilizer for the <code>ObjectFile</code> class.
- * All attributes are public.
- */
-    ObjectFile(){};
+	/**
+	 * @brief Void initilizer for the <code>ObjectFile</code> class.
+	 * All attributes are public.
+	 */
+	ObjectFile() {};
 
-    std::string name;
-    unsigned int text_size=0;
-    unsigned int data_size=0;
-    std::vector<TextCell> text_segment;
-    std::vector<DataCell> data_segment;
-    std::vector<RelocationCell> relocation_information;
-    std::map<std::string, uint32_t> symbol_table;
+	std::string name;
+	unsigned int text_size = 0;
+	unsigned int data_size = 0;
+	std::vector<TextCell> text_segment;
+	std::vector<DataCell> data_segment;
+	std::vector<RelocationCell> relocation_information;
+	std::map<std::string, uint32_t> symbol_table;
 
 };
 

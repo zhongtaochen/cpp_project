@@ -95,7 +95,7 @@ void Highlighter::highlightBlock(const QString &text)
         if (endIndex == -1) {
             setCurrentBlockState(1);
             commentLength = text.length() - startIndex;
-        } else {
+        }else {
             commentLength = endIndex - startIndex
                             + commentEndExpression.matchedLength();
         }

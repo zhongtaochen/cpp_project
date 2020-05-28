@@ -9,23 +9,23 @@ class QDirModel;
 
 class DirectoryViewer : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    DirectoryViewer(QWidget *parent = nullptr);
-    QListWidget *listwidget;
+	DirectoryViewer(QWidget* parent = nullptr);
+	QListWidget* listwidget;
 
 private slots:
-    void remove();
+	void remove();
 
 signals:
-    void removeFrom(int k);
+	void removeFrom(int k);
 
 public slots:
-    void updateList(QStringList fileNames);
+	void updateList(QStringList fileNames);
 
 private:
-    QDialogButtonBox *buttonBox;
+	QDialogButtonBox* buttonBox;
 };
 
 #endif // TREEVIEW_H

@@ -14,8 +14,6 @@ QTextStream ccout(stdout);
 QTextStream ccin(stdin);
 
 
-
-
 void trap(uint32_t pc, std::string msg);
 
 uint32_t Executor::execute(uint32_t instruction) {

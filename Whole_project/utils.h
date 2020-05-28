@@ -15,40 +15,40 @@ QStringList textseg_to_Qstring(std::vector<TextCell> text_seg);
 /**
  * @brief Return file content as string.
  */
-std::string fileToString(const std::ifstream &file);
+std::string fileToString(const std::ifstream& file);
 
 /**
  * @brief File stream specified by given file path.
  */
-std::ifstream readFile(const std::string &filepath);
+std::ifstream readFile(const std::string& filepath);
 
 /**
  * @brief Write content to file.
  * @warning Any original file content will be lost.
  */
-void writeFile(const std::string &filepath, const std::string &content);
+void writeFile(const std::string& filepath, const std::string& content);
 
 /**
  * @brief Clear comment at the end of line of assembly code.
  */
-void clearComment(std::string &asm_line);
+void clearComment(std::string& asm_line);
 
 /**
  * @brief Clear blank characters in the front and the end.
  */
-void trim(std::string &s);
+void trim(std::string& s);
 
 /**
  * @brief Check if line consisting of only blank characters.
  */
-bool isEmptyLine(const std::string &line);
+bool isEmptyLine(const std::string& line);
 
 /**
  * @brief A vector of strings splitted by the given delimiter.
  * e.g. split("main:	add $s0, $s1, $s2	#r instructions", ":")
  *      returns {"main", "	add $s0, $s1, $s2	#r instructions"}.
  */
-std::vector<std::string> split(const std::string &s, const std::string &delim);
+std::vector<std::string> split(const std::string& s, const std::string& delim);
 
 /**
  * @brief Return hexadecimal string representing the integer.
@@ -81,9 +81,9 @@ std::string combineString(std::vector<std::string> str);
  * for example, replacing "b" by "b0" and "b1" so that {"a", "b", "c"}
  * turns out to be {"a", "b0", "b1", "c"}.
  */
- void insertConverted(std::vector<std::string> &str_vec, unsigned int pos,
-    std::vector<std::vector<std::string>> vec_str_vec);
+void insertConverted(std::vector<std::string>& str_vec, unsigned int pos,
+	std::vector<std::vector<std::string>> vec_str_vec);
 
- void convertInstruction(std::string &instruction, std::string var_name, unsigned int address);
+void convertInstruction(std::string& instruction, std::string var_name, unsigned int address);
 
 #endif // UTILS_H
