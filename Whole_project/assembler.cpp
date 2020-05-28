@@ -173,6 +173,7 @@ void Assembler::scanLabels() {
 void Assembler::handleTextSection(const string &asm_text_sec) {
     preprocess(asm_text_sec);
     scanLabels();
+    asm_lines;
     obj_file.text_size = asm_lines.size() << 2;
     for (unsigned int i = 0; i < asm_lines.size(); i++) {       
         obj_file.text_segment.push_back({ i << 2, 0, asm_lines.at(i) });

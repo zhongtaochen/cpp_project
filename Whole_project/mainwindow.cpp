@@ -7,10 +7,9 @@
 #include <sstream>
 #include <iostream>
 
-//include可能改动了你检查一下！！！
 
 
-MainWindow::MainWindow()//改动了！！！
+MainWindow::MainWindow()
     : textEdit(new CodeEditor), fileList(new DirectoryViewer), Autos(new QTableWidget), TextSegment(new QTableWidget)
 {
     QSplitter *mainSplitter = new QSplitter(Qt::Horizontal);
@@ -78,14 +77,12 @@ void MainWindow::open()
 {
     if (maybeSave()) {
         QStringList addFileNames = QFileDialog::getOpenFileNames(this);
-        //改动了！
+
         for (int i=0;i<addFileNames.size();i++){
             if (!fileNames.contains(addFileNames.at(i))){
                 fileNames.push_back(addFileNames.at(i));
             }
             else{
-//                qDebug()<<"duplicated index(in addFileNames)"<<i;
-//                qDebug()<<"duplicated"<<addFileNames.at(i);
                 if (addFileNames.size()==1){
                     addFileNames.clear();
                 }else{
@@ -95,7 +92,7 @@ void MainWindow::open()
         }
         if (fileNames.size()){
             for (int i=0;i<fileNames.size();i++){
-                //qDebug()<<"fileNames after add"<<i<<fileNames.at(i);
+
             }
         }
         if (!addFileNames.isEmpty()){
@@ -105,7 +102,7 @@ void MainWindow::open()
         }
     }
 }
-//这整个函数改动了！
+
 void MainWindow::removeFromList(int k){
     fileNames.removeAt(k);
     if (fileNames.size()){
@@ -205,7 +202,7 @@ void MainWindow::about()
 }
 
 
-#include "executor.h"
+
 void MainWindow::run()
 {
 
@@ -214,18 +211,18 @@ void MainWindow::run()
                  tr("Please check if you have opened any file or you have saved the file"));
         return;
     }
-
     for(QString file_name: fileNames){
         std::ifstream file = readFile(file_name.toStdString());
-        //std::ifstream file = readFile("C:\\Users\\quyah\\Desktop\\cpp_project\\New Folder\\cpp_project\\simple_test_files\\test_core_1.asm");
+        Assembler assm;
         assm.assemble(file);
-        obj_file_list.push_back( assm.getObjFile());
-        linker.link(obj_file_list);
-        exe_file =  linker.getExecutableFile();
-        loader.load(&exe_file);
-        simulator.simulate(loader.getMemorySimulator(), loader.getRegisterFilesSimulator());
-        simulator.run();
+        obj_file_list.push_back(assm.getObjFile());
     }
+    linker.link(obj_file_list);
+
+    exe_file =  linker.getExecutableFile();
+    loader.load(&exe_file);
+    simulator.simulate(loader.getMemorySimulator(), loader.getRegisterFilesSimulator());
+    simulator.run();
 
 }
 
@@ -239,6 +236,7 @@ void MainWindow::setTextSegment(){
     TextSegment->horizontalHeader()->setStretchLastSection(true);
     TextSegment->setShowGrid(false);
     QString textEditPlainText = textEdit->document()->toPlainText();
+    Assembler assm;
     assm.assemble(textEditPlainText.toStdString());
 
     obj_file_list = { assm.getObjFile()};

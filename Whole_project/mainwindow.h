@@ -92,7 +92,7 @@ private:
     CodeEditor *textEdit;
     QString curFile;
     Highlighter *highlighter;
-    DirectoryViewer *fileList;//可能改动了？？？！！！！
+    DirectoryViewer *fileList;
     FindDialog *findDialog;
     bool isFirstTime;
     QTableWidget *Autos;
@@ -104,7 +104,6 @@ private:
                       };
     std::vector<int> breakpoints;
     int curr_row = 0;
-    Assembler assm;
     std::vector<ObjectFile> obj_file_list;
     Linker linker;
     ExecutableFile exe_file;
