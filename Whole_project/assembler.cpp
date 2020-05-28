@@ -4,7 +4,6 @@
 #include "utils.h"
 #include <iostream>
 using namespace std;
-
 Assembler::Assembler(ifstream& asm_file) {
 	Assembler(fileToString(asm_file));
 }

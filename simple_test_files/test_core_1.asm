@@ -78,6 +78,7 @@ li $s2, 12 # 0b1100
 and $s3, $s1, $s2
 bne $s3, 8, fail
 
+sdf
 
 test_andi:
 la $a0, andi_
