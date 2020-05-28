@@ -206,10 +206,15 @@ void MainWindow::about()
 
 void MainWindow::run()
 {
-    QStringList fileNames;
-    //for(QString file_name: fileNames){
-        //std::ifstream file = readFile(file_name.toStdString());
-        std::ifstream file = readFile("C:\\Users\\quyah\\Desktop\\cpp_project\\New Folder\\cpp_project\\simple_test_files\\adder.asm");
+    if(fileNames.isEmpty()){
+        QMessageBox::about(this, tr("About Run"),
+                 tr("Please check if you have opened any file or you have saved the file"));
+        return;
+    }
+
+    for(QString file_name: fileNames){
+        std::ifstream file = readFile(file_name.toStdString());
+        //std::ifstream file = readFile("C:\\Users\\quyah\\Desktop\\cpp_project\\New Folder\\cpp_project\\simple_test_files\\test_core_1.asm");
         assm.assemble(file);
         obj_file_list.push_back( assm.getObjFile());
         linker.link(obj_file_list);
@@ -217,8 +222,7 @@ void MainWindow::run()
         loader.load(&exe_file);
         simulator.simulate(loader.getMemorySimulator(), loader.getRegisterFilesSimulator());
         simulator.run();
-        qDebug()<<"end"<<endl;
-    //}
+    }
 
 }
 
@@ -273,9 +277,9 @@ void MainWindow::debug(){
 void MainWindow::to_next_breakpoint(){
     debugger.run();
     setAutos();
-    curr_row = breakpoints.front();
+    curr_row = *(breakpoints.begin());
     breakpoints.erase(breakpoints.begin());
-    std::string message = "We are at the "+std::to_string(breakpoints.size())+"th break point";
+    std::string message = "We are at the "+std::to_string(debugger.breakpointslength() - breakpoints.size())+"th break point"+"which is the"+std::to_string(curr_row+1)+"th row";
     QMessageBox::about(this, tr("About to_next_breakpoint"),tr(message.c_str()));
 }
 
@@ -285,6 +289,8 @@ void MainWindow::step(){
     }else{
         curr_row+=1;
         debugger.step();
+        std::string message = "We are at the "+std::to_string(curr_row)+"th row";
+        QMessageBox::about(this, tr("About to_next_breakpoint"),tr(message.c_str()));
     }
 }
 
@@ -294,14 +300,12 @@ void MainWindow::changeBreakpoints(int row, int col){
      if(TextSegment->item(row, col)->checkState() == Qt::Checked){
          debugger.addBreakpoint(address);
          breakpoints.push_back(row);
-         std::sort(breakpoints.begin(),breakpoints.end());
+         std::sort(breakpoints.begin(),prev(breakpoints.end()));
 
      }else{
          debugger.removeBreakpoint(address);
-//         auto search = breakpoints.
-//         if (search != breakpoints.end()) breakpoints.erase(search);
-         //breakpoints.erase(breakpoints.begin());
-
+         std::vector<int>::iterator iter=std::find(breakpoints.begin(),breakpoints.end(),3);
+         breakpoints.erase(iter);
      }
 }
 

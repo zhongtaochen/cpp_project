@@ -64,8 +64,6 @@ private slots:
     void documentWasModified();
     void changeBreakpoints(int row, int col);
     void removeFromList(int k);//改动了！！！！！
-#ifndef QT_NO_SESSIONMANAGER
-    void commitData(QSessionManager &);
     void setTextSegment();
     void setAutos();
     void to_next_breakpoint();
@@ -77,6 +75,8 @@ private slots:
  * @brief step to the next line of execution.
  */
     void step();
+#ifndef QT_NO_SESSIONMANAGER
+    void commitData(QSessionManager &);
 #endif
 
 private:

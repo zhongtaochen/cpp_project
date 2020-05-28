@@ -47,6 +47,7 @@ void testDebugger(){
     debugger.removeBreakpoint(0x00400010);
     assert(debugger.run() == 0x00400014);
     std::cout << "Expected:\n0x0040000c\n0x00400010\n" << std::endl;
+    std::cout<<"keyyi"<<std::endl;
 
     Debugger debugger2(&exe_file);
     debugger2.addBreakpoint(0x00400008);
