@@ -1,8 +1,13 @@
+/**
+ * @file lineassembler_data.cpp
+ * @brief Neccessary information for <code>LineAssembler</code> class.
+ */
+
 #include "lineassembler.h"
 using namespace std;
 
-const map<string, Format> LineAssembler::R_BIN =
-{ {"add",     {RD,   RS,   RT,   0b100000} },
+const map<string, Format> LineAssembler::R_BIN = {
+    {"add",     {RD,   RS,   RT,   0b100000} },
 	{"addu",    {RD,   RS,   RT,   0b100001} },
 	{"and",     {RD,   RS,   RT,   0b100100} },
 	{"break",   {NONE, NONE, NONE, 0b001101} },
@@ -39,8 +44,8 @@ const map<string, Format> LineAssembler::R_BIN =
 	{"tltu",    {RS,   RT,   NONE, 0X33    } }
 };
 
-const map<string, Format> LineAssembler::I_BIN =
-{ {"addi",  {RT, RS,     IMM,   0b001000} },
+const map<string, Format> LineAssembler::I_BIN = {
+    {"addi",  {RT, RS,     IMM,   0b001000} },
 	{"addiu", {RT, RS,     IMM,   0b001001} },
 	{"andi",  {RT, RS,     IMM,   0b001100} },
 	{"beq",   {RS, RT,     LABEL, 0b000100} },
@@ -55,14 +60,12 @@ const map<string, Format> LineAssembler::I_BIN =
 	{"lhu",   {RT, IMM_RS, NONE,  0b100101} },
 	{"lui",   {RT, IMM,    NONE,  0b001111} },
 	{"lw",    {RT, IMM_RS, NONE,  0b100011} },
-
 	{"ori",   {RT, RS,     IMM,   0b001101} },
 	{"sb",    {RT, IMM_RS, NONE,  0b101000} },
 	{"slti",  {RT, RS,     IMM,   0b001010} },
 	{"sltiu", {RT, RS,     IMM,   0b001011} },
 	{"sh",    {RT, IMM_RS, NONE,  0b101001} },
 	{"sw",    {RT, IMM_RS, NONE,  0b101011} },
-
 	{"xori",  {RT, RS,     IMM,   0b001110} },
 
 	{"bgezal",{RS, LABEL,  NONE,  0b000001} },
@@ -81,13 +84,13 @@ const map<string, Format> LineAssembler::I_BIN =
 	{"sc",    {RT, IMM_RS, NONE,  0x38    } }
 };
 
-const map<string, Format> LineAssembler::J_BIN =
-{ {"j",   {LABEL, NONE, NONE, 0b000010} },
+const map<string, Format> LineAssembler::J_BIN = {
+    {"j",   {LABEL, NONE, NONE, 0b000010} },
 	{"jal", {LABEL, NONE, NONE, 0b000011} }
 };
 
 const vector<string> LineAssembler::REG_BIN =
-{ "$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0",
+{    "$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0",
 	 "$t1",   "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1",
 	 "$s2",   "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$k0",
 	 "$k1",   "$gp", "$sp", "$fp", "$ra"

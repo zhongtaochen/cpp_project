@@ -7,7 +7,9 @@
 #include "simulator.h"
 #include <iostream>
 #include <QTextStream>
+
 QTextStream ccerr(stderr, QIODevice::WriteOnly);
+
 MemorySimulator::MemorySimulator(unsigned int num_of_bytes) {
 	this->mem_arr = new uint8_t[num_of_bytes];
 	this->__end_address = __start_address + num_of_bytes - 1;
@@ -86,14 +88,16 @@ void RegisterFilesSimulator::checkValid(unsigned int id) {
 Simulator::Simulator(MemorySimulator* mem, RegisterFilesSimulator* reg) {
 	simulate(mem, reg);
 };
+
 void Simulator::simulate(MemorySimulator* mem, RegisterFilesSimulator* reg) {
 	this->mem = mem;
 	this->reg = reg;
 	this->pc = MemorySimulator::__start_address;
+    this->exit = 0;
 }
 
 void Simulator::run() {
-	while (true) {
+    while (!exit) {
 		execute(mem->readWord(pc));
 	}
 };

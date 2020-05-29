@@ -18,8 +18,7 @@ void Loader::load(ExecutableFile* exe_file) {
 	}
 
 	reg = new RegisterFilesSimulator;
-	//    reg->writeReg(28, exe_file->data_segment.at(0).address); // $gp
-	reg->writeReg(28, 0x00500000);
+    reg->writeReg(28, 0x00500000); // $gp
 	reg->writeReg(29, mem->getEndAddress()); // $fp
 }
 

@@ -1,3 +1,8 @@
+/**
+ * @file lineassembler_r.cpp
+ * @brief <code>R_LineAssembler</code> class implementation.
+ */
+
 #include "lineassembler.h"
 #include "utils.h"
 using namespace std;

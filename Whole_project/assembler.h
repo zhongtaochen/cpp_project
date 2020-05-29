@@ -1,48 +1,41 @@
+/**
+ * @file assembler.h
+ * @brief <code>Assembler</code> class.
+ * @details This file exports <code>Assembler</code> class, which processes assembly
+ * code and outputs an <code>ObjectFile</code>.
+ */
+
 #ifndef ASSEMBLER_H
 #define ASSEMBLER_H
 
 #include "objectfile.h"
 #include <string>
 #include <fstream>
-//enum PseudoOperandType {IMM_Pseudo,NONE_Pseudo,LABEL, RDEST, RSRC1, RSRC2, SRC2, ADDRESS, FRSRC1, FDEST };
-//struct Format_Pseudo { PseudoOperandType op1; PseudoOperandType op2; PseudoOperandType op3; };
 
+/**
+ * @brief Assembles assembly code and outputs an <code>ObjectFile</code>.
+ */
 class Assembler {
 
 public:
 
 /**
- * Constructor: Assembler
- * Usage: Assembler assm(asm_file);
- *        Assembler assm(asm_code);
- *        Assembler assm;
- * --------------------------------
- * @brief Create an Assembler object.
+ * @brief Intializer for <code>Assembler</code> class.
  */
+
     Assembler(){};
     Assembler(std::ifstream &asm_file);
     Assembler(const std::string &asm_code);
 
 /**
- * Method: output
- * Usage: assm.output(file_path);
- * ------------------------------
- * @brief Output binary machine code in text file format.
+ * @brief Assemble assembly code.
  */
-    void output(const std::string &file_path);
 
-/**
- * Method: assemble
- * Usage: assm.assemble(asm_file);
- *        assm.assemble(asm_code);
- * ------------------------------
-* @brief set the Assembler objcet
-*/
      void assemble(std::ifstream &asm_file);
      void assemble(const std::string &asm_code);
 
 /**
- * @brief Return corresponding object file.
+ * @brief Return assembled object file.
  */
 
     ObjectFile getObjFile() {return obj_file;};
@@ -54,13 +47,14 @@ private:
     
 
 /**
- * @brief Fill data section in object file.
+ * @brief Fill data section and part of symbol table in object file.
  */
 
     void handleDataSection(const std::string &asm_data_sec);
 
 /**
- * @brief Complete object file.
+ * @brief Fill text section, part of relocation information, and
+ * part of relocation information in object file.
  */
 
     void handleTextSection(const std::string &asm_text_sec);
@@ -74,17 +68,15 @@ private:
     void preprocess(const std::string &asm_code);
 
 /**
- * @brief Fill symbol table with relative address
- * if the label exists in the text section.
+ * @brief Fill symbol table with relative address for labels in
+ * text section.
  */
 
     void scanLabels();
  
-    /**
- * Method: pseudoConversion
- * Usage: pseudoConversion();
- * -----------------------
- * @brief Convert pseudo instruction to real instructions.
+/**
+ * @brief Convert pseudo instructions to real instructions.
+ * @param i relative instruction index in <code>asm_lines</code>
  */
 
     void pseudoConversion(std::string asm_line, int i);

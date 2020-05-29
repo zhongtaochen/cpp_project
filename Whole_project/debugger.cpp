@@ -16,11 +16,12 @@ void Debugger::debug(ExecutableFile* exe_file) {
 	this->mem = loader.getMemorySimulator();
 	this->reg = loader.getRegisterFilesSimulator();
 	this->pc = MemorySimulator::__start_address;
+    this->exit = 0;
 };
-int Debugger::breakpointslength() {
+
+int Debugger::getNumOfBreakpoints() {
 	return breakpoints.size();
 }
-
 
 uint32_t Debugger::run() {
 	static bool firstrun = true;
@@ -28,7 +29,7 @@ uint32_t Debugger::run() {
 		firstrun = false;
 		if (breakpoints.count(pc) == 1) return pc;
 	}
-	while (true) {
+    while (!exit) {
 		execute(mem->readWord(pc));
 		if (breakpoints.count(pc) == 1) break;
 	}

@@ -25,22 +25,26 @@ public:
 
 /**
  * @brief Initializer for <code>Debugger</code> class.
- * @param exe_file program to be debugged.
  */
+
     Debugger(){};
     Debugger(ExecutableFile* exe_file);
-/**
- * @brief Set the Debugger object
- * @param exe_file program to be debugged.
- */
-    void debug(ExecutableFile* exe_file);
-/**
- * @brief Check the number of breakpoints;
- */
-    int breakpointslength();
 
 /**
- * @brief Runs MIPS instructions stored in the text section until the program
+ * @brief Update program to be debugged.
+ * @param exe_file program to be debugged.
+ */
+
+    void debug(ExecutableFile* exe_file);
+
+/**
+ * @brief Return the number of breakpoints.
+ */
+
+    int getNumOfBreakpoints();
+
+/**
+ * @brief Run MIPS instructions stored in the text section until the program
  * encounters a breakpoint.
  * @return Address of the encoutered breakpoint, and also the address of the
  * instruction to be excuted next.

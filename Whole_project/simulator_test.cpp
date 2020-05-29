@@ -7,12 +7,11 @@
 #include "simulator.h"
 #include <assert.h>
 
-
- /**
-  * @brief Simple unit tests for <code>MemorySimulator</code> class.
-  * @details Cover all core methods and special handling for out-of-bound situation.
-  * Implementation passed all unit tests.
-  */
+/**
+* @brief Simple unit tests for <code>MemorySimulator</code> class.
+* @details Cover all core methods and special handling for out-of-bound situation.
+* Implementation passed all unit tests.
+*/
 void testMemorySimulator() {
 	MemorySimulator mem(8);
 

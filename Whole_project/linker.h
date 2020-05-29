@@ -1,3 +1,11 @@
+/**
+ * @file linker.h
+ * @brief <code>Linker</code> class.
+ * @details This file exports <code>Linker</code> class, which takes multiple
+ * <code>ObjectFile</code> objects as input and produces <code>ExecutableFile</code>
+ * with static linking scheme.
+ */
+
 #ifndef LINKER_H
 #define LINKER_H
 
@@ -5,31 +13,32 @@
 #include "executablefile.h"
 #include <vector>
 
+/**
+ * @brief Staticly links several object files and produces executable files for
+ * further simulation or debugging.
+ */
 class Linker {
 
 public:
 
-	/**
-	 * Constructor: Linker
-	 * Usage: Linker linker(obj_file_list);
-	 * ------------------------------------
-	 * @brief Initilize Linker object and generate executable file.
-	 */
-	Linker() {};
+/**
+ * @brief Initilizer for <code>Linker</code> class.
+ */
+
+    Linker(){};
 	Linker(std::vector<ObjectFile>& obj_file_list);
-	/**
-	 * Method: getExecutableFile
-	 * Usage: ExecutableFile exe_file = linker.getExecutableFile();
-	 * ------------------------------------------------------------
-	 * @brief Return corresponding executable file.
-	 */
+
+/**
+ * @brief Return corresponding executable file.
+ */
+
 	ExecutableFile getExecutableFile() { return exe_file; };
-	/**
-	 * Method: link
-	 * Usage: linker.link(obj_file_list)
-	 * ------------------------------------------------------------
-	 * @brief Set the linker object and generate executable file
-	 */
+
+/**
+ * @brief Link <code>ObjectFile</code> objects and produce
+ * <code>ExecutableFile</code>.
+ */
+
 	void link(std::vector<ObjectFile>& obj_file_list);
 
 private:
@@ -38,10 +47,4 @@ private:
 
 };
 
-
 #endif // LINKER_H
-
-
-
-
-

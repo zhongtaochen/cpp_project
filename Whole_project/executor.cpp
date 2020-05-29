@@ -9,10 +9,11 @@
 #include <iomanip>
 #include "fstream"
 #include <QTextStream>
+#include <sstream>
+#include <QString>
 
 QTextStream ccout(stdout);
 QTextStream ccin(stdin);
-
 
 void trap(uint32_t pc, std::string msg);
 
@@ -287,7 +288,9 @@ void Executor::syscall() {
 		(*reg)[2] = (*reg)[29];
 	}
 	else if ((*reg)[2] == 10) { // exit
-		exit(0);
+//		exit(0);
+        ccout << "Program exits." << endl;
+        exit = 1;
 	}
 	else if ((*reg)[2] == 11) { // print_char
 		ccout << (char)(*reg)[4] << endl;
@@ -337,10 +340,7 @@ void Executor::syscall() {
 		(*reg)[4] = num_chars_written;
 	}
 	else if ((*reg)[2] == 16) { // close
-	 // do nothing
-	}
-	else if ((*reg)[2] == 17) {
-		exit(0); // return $a0 is ommitted
+        // do nothing
 	}
 }
 
@@ -348,8 +348,6 @@ void Executor::syscall() {
  * @brief Trap exception. Print address of the exception and detailed information.
  * Furthermore, the program will be aborted.
  */
-#include <sstream>
-#include <QString>
 void trap(uint32_t pc, std::string msg) {
 	std::stringstream sstrm;
 	sstrm << "Address: 0x" << std::setw(8) << std::setfill('0')
