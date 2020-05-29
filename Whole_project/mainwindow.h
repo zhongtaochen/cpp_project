@@ -37,72 +37,150 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow();
+    /**
+     * @brief Initialize a new MainWindow.
+     */
+    MainWindow();
+    /**
+     * @brief A QStringList to keep the file names of all opened file.
+     */
     QStringList fileNames;
-	void loadFile(const QString& fileName);
+    /**
+     * @brief Present a file with specified fileName in codeEditor.
+     */
+    void loadFile(const QString& fileName);
 
 public slots:
-	void search(const QString& str);
-	void clear();
+    /**
+     * @brief Find and highlight the str in codeEditor if str is found successfully.
+     *        Show an error message if str isn't found.
+     */
+    void search(const QString& str);
+    /**
+     * @brief Undo the highlights in search func.
+     */
+    void clear();
 
 signals:
-	void tryUpdate(QStringList fileNames);
+    /**
+     * @brief A signal that emits to update the fileList when opening file.
+     */
+    void tryUpdate(QStringList addFileNames);
 
 protected:
-	void closeEvent(QCloseEvent* event) override;
+    /**
+     * @brief Ask user whether to save changes or not before closing an event.
+     */
+    void closeEvent(QCloseEvent* event) override;
 
 private slots:
-	void newFile();
-	void open();
-	bool save();
-	bool saveAs();
-	void find();
-	void about();
+    /**
+     * @brief Create a new file.
+     */
+    void newFile();
+    /**
+     * @brief Open an existing file.
+     */
+    void open();
+    /**
+     * @brief Save the change to current file.
+     */
+    bool save();
+    /**
+     * @brief Save the current file as a name inputed by user.
+     */
+    bool saveAs();
+    /**
+     * @brief Ask user to input a string.
+     *        Find and highlight the string in the current file.(by calling search func)
+     */
+    void find();
+    /**
+     * @brief Show the application's About box.
+     */
+    void about();
+    /**
+     * @brief Remove the file whose index is k from the QStringList:fileNames.
+     *        If there are any files left, present the first file in fileNames in codeEditor.
+     *        Otherwise, clear the codeEditor.
+     */
     void removeFromList(int k);
+    /**
+     * @brief Change contents presented in codeEditor to what user double clicked in fileList
+     */
     void changeTo(int currentFile);
     /**
-     * @brief Run the .asm file
+     * @brief Run the .asm file.
      */
-	void run();
+    void run();
     /**
      * @brief Initialize the debugger and set text segment.
      */
-	void debug();
-	void documentWasModified();
+    void debug();
+    /**
+     * @brief Set whether the file in codeEditor is modified.
+     */
+    void documentWasModified();
     /**
      * @brief Set or remove breakpoints at (row, col).
      */
-	void changeBreakpoints(int row, int col);
+    void changeBreakpoints(int row, int col);
     /**
      * @brief Fill the TextSegment with machinecodes and mips instructions.
      */
-	void setTextSegment();
+    void setTextSegment();
     /**
      * @brief Show values of registers in the interface.
      */
-	void setAutos();
+    void setAutos();
     /**
      * @brief Run the codes to the next break point.
      */
-	void to_next_breakpoint();
-
-	/**
-	 * @brief step to the next line of execution.
-	 */
-	void step();
+    void to_next_breakpoint();
+    /**
+     * @brief step to the next line of execution.
+     */
+    void step();
 #ifndef QT_NO_SESSIONMANAGER
-	void commitData(QSessionManager&);
+    /**
+     * @brief Save all the data,i.e., all the files opened and with operating permission to.
+     */
+    void commitData(QSessionManager&);
 #endif
 
 private:
-	void createActions();
-	void createStatusBar();
-	void readSettings();
-	void writeSettings();
-	bool maybeSave();
-	bool saveFile(const QString& fileName);
-	void setCurrentFile(const QString& fileName);
-	QString strippedName(const QString& fullFileName);
+    /**
+     * @brief 1.Create and set up the actions
+     *        2.Create the menu and populate them with the actions.
+     *        3.Create the toolbars and populate them with the actions.
+     */
+    void createActions();
+    /**
+     * @brief Create the StatusBar.
+     */
+    void createStatusBar();
+    /**
+     * @brief
+     */
+    void readSettings();
+    /**
+     * @brief
+     */
+    void writeSettings();
+    /**
+     * @brief Ask user whether to save the change to file in codeEditor.
+     *        If yes, save the file(by calling save func).
+     */
+    bool maybeSave();
+    /**
+     * @brief Store current contents in codeEditor to the file.
+     */
+    bool saveFile(const QString& fileName);
+    /**
+     * @brief Set path of current file as the Qstring:fileName.
+     *        Called when trying to loadFile or saveFile.
+     */
+    void setCurrentFile(const QString& fileName);
 
 	CodeEditor* textEdit;
 	QString curFile;

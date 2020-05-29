@@ -21,7 +21,7 @@ MainWindow::MainWindow()
 	Autos->setColumnCount(2);
 	Autos->setWindowTitle("Variables & values");
 	QStringList header1;
-	header1 << "Variables" << "Values";
+    header1 << "Registers" << "Values";
 	Autos->setHorizontalHeaderLabels(header1);
 	Autos->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	Autos->horizontalHeader()->setStretchLastSection(true);
@@ -29,7 +29,7 @@ MainWindow::MainWindow()
     TextSegment->setColumnCount(1);
     TextSegment->setWindowTitle("breakpoint & asm_lines");
     QStringList header2;
-    header2 << "address" << "asm_lines";
+    header2 << "address        asm_lines";
     TextSegment->setHorizontalHeaderLabels(header2);
     TextSegment->setEditTriggers(QAbstractItemView::NoEditTriggers);
     TextSegment->horizontalHeader()->setStretchLastSection(true);
@@ -392,7 +392,7 @@ void MainWindow::createActions()
 
 	const QIcon exitIcon = QIcon::fromTheme("application-exit");
 	QAction* exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
-	exitAct->setShortcuts(QKeySequence::Quit);
+
 	exitAct->setStatusTip(tr("Exit the application"));
 
     // editMenu
@@ -600,10 +600,10 @@ void MainWindow::setCurrentFile(const QString &fileName)
         shownName = "untitled.txt";
     setWindowFilePath(shownName);
 }
-QString MainWindow::strippedName(const QString& fullFileName)
-{
-	return QFileInfo(fullFileName).fileName();
-}
+//QString MainWindow::strippedName(const QString& fullFileName)
+//{
+//	return QFileInfo(fullFileName).fileName();
+//}
 #ifndef QT_NO_SESSIONMANAGER
 void MainWindow::commitData(QSessionManager& manager)
 {
