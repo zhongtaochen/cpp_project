@@ -66,3 +66,91 @@ syscall
 li $s1, 1
 addiu $s2, $s1, -1
 bne $s3, 0, fail
+
+
+test_and:
+la $a0, and_
+li $v0, 4
+syscall
+
+li $s1, 10 # 0b1010
+li $s2, 12 # 0b1100
+and $s3, $s1, $s2
+bne $s3, 8, fail
+
+
+test_andi:
+la $a0, andi_
+li $v0, 4
+syscall
+
+li $s1, 10 # 0b1010
+andi $s2, $s1, 12
+bne $s2, 8, fail
+
+
+test_div:
+la $a0, div_
+li $v0, 4
+syscall
+
+li $s1, 20
+li $s2, -6
+div $s1, $s2
+mfhi $s3
+bne $s3, 2, fail
+mflo $s3
+bne $s3, -3, fail
+
+
+test_divu:
+la $a0, divu_
+li $v0, 4
+syscall
+
+li $s1, 20
+li $s2, 6
+divu $s1, $s2
+mfhi $s3
+bne $s3, 2, fail
+mflo $s3
+bne $s3, 3, fail
+
+
+test_mult:
+la $a0, mult_
+li $v0, 4
+syscall
+
+li $s1, 1
+li $s2, -1
+mult $s1, $s2
+mfhi $s3
+bne $s3, -1, fail
+mflo $s3
+bne $s3, -1, fail
+
+
+test_multu:
+la $a0, multu_
+li $v0, 4
+syscall
+
+li $s1, 1
+li $s2, 3
+mult $s1, $s2
+mfhi $s3
+bne $s3, 0, fail
+mflo $s3
+bne $s3, 3, fail
+
+
+test_nor:
+la $a0, nor_
+li $v0, 4
+syscall
+
+li $s1, -1
+li $s2, -1
+nor $s3, $s1, $s2
+bne $s3, 0, fail
