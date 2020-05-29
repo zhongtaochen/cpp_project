@@ -1,3 +1,10 @@
+/**
+ * @file finddialog.h
+ * @brief <code>FindDialog</code> class.
+ * @details This file exports <code>FindDialog</code> class,
+ * which provides a tool to search user-specified contents in files.
+ */
+
 #ifndef FINDDIALOG_H
 #define FINDDIALOG_H
 #include <QDialog>
