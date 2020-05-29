@@ -269,16 +269,16 @@ void Executor::syscall() {
 		ccout << endl;
 	}
 	else if ((*reg)[2] == 5) { // read_int
-		int32_t in;
-		ccin >> in;
+        int32_t in = ccin.readLine().toInt();
 		reg->writeReg(2, in);
 	}
 	else if ((*reg)[2] == 8) { // read_string
 		uint32_t address = (*reg)[4];
 		uint32_t length = (*reg)[5];
+        QString in = ccin.readLine();
 		char curr_char;
 		for (uint32_t i = 0; i < length; i++) {
-			ccin >> curr_char;
+            curr_char = in.at(i).toLatin1();
 			mem->writeByte(address + i, curr_char);
 		}
 	}
@@ -296,8 +296,7 @@ void Executor::syscall() {
 		ccout << (char)(*reg)[4] << endl;
 	}
 	else if ((*reg)[2] == 12) { // read_char
-		char in;
-		ccin >> in;
+        char in = ccin.readLine().front().toLatin1();
 		reg->writeReg(2, in);
 	}
 	else if ((*reg)[2] == 13) { // open
