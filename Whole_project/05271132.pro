@@ -21,7 +21,6 @@ SOURCES += \
     debugger.cpp \
     debugger_test.cpp \
     executor.cpp \
-    executor_test.cpp \
     finddialog.cpp \
     highlighter.cpp \
     lineassembler.cpp \

@@ -1,3 +1,10 @@
+/**
+ * @file mainwindow.h
+ * @brief <code>Mainwindow</code> class.
+ * @details This file exports <code>Mainwindow</code> class, which displays the GUI and support open,
+ * save and remove files and debug and run MIPS Program.
+ */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -11,6 +18,7 @@
 #include "loader.h"
 #include "simulator.h"
 #include "utils.h"
+#include "finddialog.h"
 
 #include <QMainWindow>
 #include <QTextCharFormat>
@@ -20,16 +28,7 @@
 #include <QApplication>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-#include <QListWidget>  //这里可能改动了！！！
-
-
-class QAction;
-class QMenu;
-class QPlainTextEdit;
-class QLineEdit;
-class QTreeWidget;
-class QSessionManager;
-class FindDialog;
+#include <QListWidget>
 
 
 
@@ -39,14 +38,14 @@ class MainWindow : public QMainWindow
 
 public:
 	MainWindow();
-	QStringList fileNames;//改动了！！！！！
+    QStringList fileNames;
 	void loadFile(const QString& fileName);
 
 public slots:
 	void search(const QString& str);
 	void clear();
 
-signals://改动了！！！！！
+signals:
 	void tryUpdate(QStringList fileNames);
 
 protected:
