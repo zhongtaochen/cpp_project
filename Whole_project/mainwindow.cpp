@@ -234,7 +234,6 @@ void MainWindow::run()
 		obj_file_list.push_back(assm.getObjFile());
 	}
 	linker.link(obj_file_list);
-
 	exe_file = linker.getExecutableFile();
 	loader.load(&exe_file);
 	simulator.simulate(loader.getMemorySimulator(), loader.getRegisterFilesSimulator());
