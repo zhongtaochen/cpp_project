@@ -17,6 +17,7 @@ void Debugger::debug(ExecutableFile* exe_file) {
 	this->reg = loader.getRegisterFilesSimulator();
 	this->pc = MemorySimulator::__start_address;
     this->exit = 0;
+    this->breakpoints.clear();
 };
 
 int Debugger::getNumOfBreakpoints() {

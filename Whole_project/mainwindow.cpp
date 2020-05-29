@@ -16,7 +16,7 @@ MainWindow::MainWindow()
 	mainSplitter->addWidget(fileList);
 	mainSplitter->addWidget(textEdit);
 	mainSplitter->addWidget(Autos);
-	mainSplitter->addWidget(TextSegment);
+    mainSplitter->addWidget(TextSegment);
 
 	Autos->setColumnCount(2);
 	Autos->setWindowTitle("Variables & values");
@@ -25,6 +25,15 @@ MainWindow::MainWindow()
 	Autos->setHorizontalHeaderLabels(header1);
 	Autos->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	Autos->horizontalHeader()->setStretchLastSection(true);
+
+    Autos->setColumnCount(1);
+    TextSegment->setWindowTitle("breakpoint & asm_lines");
+    QStringList header2;
+    header2 << "address" << "asm_lines";
+    TextSegment->setHorizontalHeaderLabels(header2);
+    TextSegment->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    TextSegment->horizontalHeader()->setStretchLastSection(true);
+    TextSegment->setShowGrid(false);
 
 	mainSplitter->setStretchFactor(1, 1);
 
@@ -221,7 +230,7 @@ void MainWindow::about()
 
 void MainWindow::run()
 {
-
+    obj_file_list = {};
 	if (fileNames.isEmpty()) {
 		QMessageBox::about(this, tr("About Run"),
 			tr("Please check if you have opened any file or you have saved the file"));
@@ -233,6 +242,7 @@ void MainWindow::run()
 		assm.assemble(file);
 		obj_file_list.push_back(assm.getObjFile());
 	}
+    Linker linker;
 	linker.link(obj_file_list);
 	exe_file = linker.getExecutableFile();
 	loader.load(&exe_file);
@@ -242,39 +252,16 @@ void MainWindow::run()
 }
 
 void MainWindow::setTextSegment() {
-	TextSegment->setColumnCount(1);
-	TextSegment->setWindowTitle("breakpoint & line");
-	QStringList header2;
-	header2 << "bp" << "line";
-	TextSegment->setHorizontalHeaderLabels(header2);
-	TextSegment->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	TextSegment->horizontalHeader()->setStretchLastSection(true);
-	TextSegment->setShowGrid(false);
-    if (fileNames.isEmpty()) {
-        QMessageBox::about(this, tr("About Run"),
-            tr("Please check if you have opened any file or you have saved the file"));
-        return;
-    }
-    for (QString file_name : fileNames) {
-        std::ifstream file = readFile(file_name.toStdString());
-        Assembler assm;
-        assm.assemble(file);
-        obj_file_list.push_back(assm.getObjFile());
-    }
-	linker.link(obj_file_list);
-	ExecutableFile exe_file = linker.getExecutableFile();
-	debugger.debug(&exe_file);
 	QStringList result = textseg_to_Qstring(debugger.getTextSection());
-	TextSegment->setRowCount(result.size());
+	TextSegment->setRowCount(result.size());;
+    TextSegment->setColumnCount(1);
 	for (int i = 0; i < result.size(); i++) {
 		QString tmp = result.at(i);
 		QTableWidgetItem* item0 = new QTableWidgetItem(tmp);
 		item0->setCheckState(Qt::Unchecked);
 		TextSegment->setItem(i, 0, item0);
-	}
-
-	TextSegment->viewport()->update();
-
+    }
+    TextSegment->viewport()->update();
 }
 
 void MainWindow::setAutos() {
@@ -293,7 +280,24 @@ void MainWindow::setAutos() {
 	Autos->viewport()->update();
 }
 void MainWindow::debug() {
-	setTextSegment();
+    if (fileNames.isEmpty()) {
+        QMessageBox::about(this, tr("About Debug"),
+            tr("Please check if you have opened any file or you have saved the file"));
+        return;
+    }
+    obj_file_list.clear();
+    breakpoints.clear();
+    for (QString file_name : fileNames) {
+        std::ifstream file = readFile(file_name.toStdString());
+        Assembler assm;
+        assm.assemble(file);
+        obj_file_list.push_back(assm.getObjFile());
+    }
+    Linker linker;
+    linker.link(obj_file_list);
+    ExecutableFile exe_file = linker.getExecutableFile();
+    debugger.debug(&exe_file);
+    setTextSegment();
 	QMessageBox::about(this, tr("About Debug"), tr("Now you need to set breakpoints(●'◡'●)"));
 	connect(TextSegment, SIGNAL(cellChanged(int, int)), this, SLOT(changeBreakpoints(int, int)));
 }
@@ -301,10 +305,15 @@ void MainWindow::debug() {
 void MainWindow::to_next_breakpoint() {
 	debugger.run();
 	setAutos();
-	curr_row = *(breakpoints.begin());
-	breakpoints.erase(breakpoints.begin());
-	std::string message = "We are at the " + std::to_string(debugger.getNumOfBreakpoints() - breakpoints.size()) + "th break point" + "which is the" + std::to_string(curr_row + 1) + "th row";
-	QMessageBox::about(this, tr("About to_next_breakpoint"), tr(message.c_str()));
+    if(!breakpoints.empty()){
+        curr_row = *(breakpoints.begin());
+        breakpoints.erase(breakpoints.begin());
+        std::string message = "We are at the " + std::to_string(debugger.getNumOfBreakpoints() - breakpoints.size()) + "th break point" + "which is the" + std::to_string(curr_row + 1) + "th row";
+        QMessageBox::about(this, tr("About to_next_breakpoint"), tr(message.c_str()));
+    }
+    else{
+        QMessageBox::about(this, tr("About to_next_breakpoint"), tr("Now we reach the end of the program"));
+    }
 }
 
 void MainWindow::step() {
@@ -315,14 +324,14 @@ void MainWindow::step() {
 		curr_row += 1;
 		debugger.step();
 		std::string message = "We are at the " + std::to_string(curr_row + 1) + "th row";
-		QMessageBox::about(this, tr("About to_next_breakpoint"), tr(message.c_str()));
+        QMessageBox::about(this, tr("About to_next_line"), tr(message.c_str()));
 	}
 }
 
 void MainWindow::changeBreakpoints(int row, int col) {
 
     QString addr = TextSegment->item(row, 0)->text();
-	uint32_t address = stoi(addr.left(32).toStdString(), 0, 2);
+    uint32_t address = stoi(addr.left(32).toStdString(), 0, 16);
 	if (TextSegment->item(row, col)->checkState() == Qt::Checked) {
 		debugger.addBreakpoint(address);
 		breakpoints.push_back(row);

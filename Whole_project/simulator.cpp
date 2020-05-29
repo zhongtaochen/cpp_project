@@ -52,7 +52,7 @@ uint32_t MemorySimulator::getEndAddress() {
 unsigned int MemorySimulator::toIndex(uint32_t address) {
 	if (address < __start_address || address > __end_address) {
 		ccerr << "Memory address out of bound. Abort." << endl;
-		exit(0);
+        //exit(0);
 	}
 	return address - __start_address;
 }
@@ -81,7 +81,7 @@ uint32_t& RegisterFilesSimulator::operator[](unsigned int id) {
 void RegisterFilesSimulator::checkValid(unsigned int id) {
 	if (id >= 34) {
 		ccerr << "Register files id out of bound. Abort." << endl;
-		exit(0);
+        //exit(0);
 	}
 }
 

@@ -16,7 +16,7 @@ QStringList textseg_to_Qstring(std::vector<TextCell> text_seg) {
 	QStringList resultlist;
 	for (auto const& pair : text_seg) {
 		QString instrctn = QString::fromStdString(pair.instruction);
-		QString addr = QString::fromStdString(intToBinaryString(pair.address));
+        QString addr = QString::fromStdString(intToHexString(pair.address));
 		resultlist.append(QString("%1 %2").arg(addr, instrctn));
 	}
 	return resultlist;

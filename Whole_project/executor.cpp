@@ -354,5 +354,4 @@ void trap(uint32_t pc, std::string msg) {
 		<< std::hex << pc;
 	ccout << QString::fromStdString(sstrm.str()) << endl;
 	ccout << QString::fromStdString(msg) << endl;
-	exit(1);
 }

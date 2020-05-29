@@ -120,7 +120,7 @@ private:
 	std::vector<int> breakpoints;
 	int curr_row = 0;
 	std::vector<ObjectFile> obj_file_list;
-	Linker linker;
+    //Linker linker;
 	ExecutableFile exe_file;
 	Debugger debugger;
 	Loader loader;
