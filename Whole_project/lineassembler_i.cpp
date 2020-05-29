@@ -1,3 +1,8 @@
+/**
+ * @file lineassembler_i.cpp
+ * @brief <code>I_LineAssembler</code> class implementation.
+ */
+
 #include "lineassembler.h"
 #include "utils.h"
 #include <iostream>

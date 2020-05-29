@@ -25,8 +25,8 @@ public:
  */
     ExecutableFile(){};
 
-    unsigned int text_size=0;
-    unsigned int data_size=0;
+    unsigned int text_size = 0;
+    unsigned int data_size = 0;
     std::vector<TextCell> text_segment;
     std::vector<DataCell> data_segment;
 };

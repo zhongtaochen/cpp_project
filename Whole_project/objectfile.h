@@ -15,10 +15,10 @@
 #include <vector>
 #include <map>
 
- /**
-  * @brief Basic unit for text segment in both <code>ObjectFile</code> and
-  * <code>ExecutableFile</code> class.
-  */
+/**
+* @brief Basic unit for text segment in both <code>ObjectFile</code> and
+* <code>ExecutableFile</code> class.
+*/
 struct TextCell {
 	uint32_t address;
 	uint32_t machine_code;
@@ -51,10 +51,10 @@ class ObjectFile {
 
 public:
 
-	/**
-	 * @brief Void initilizer for the <code>ObjectFile</code> class.
-	 * All attributes are public.
-	 */
+/**
+ * @brief Void initilizer for the <code>ObjectFile</code> class.
+ * All attributes are public.
+ */
 	ObjectFile() {};
 
 	std::string name;

@@ -1,3 +1,8 @@
+/**
+ * @file lineassembler.cpp
+ * @brief <code>LineAssembler</code> class implementation.
+ */
+
 #include "lineassembler.h"
 #include "utils.h"
 #include <algorithm>
@@ -34,7 +39,6 @@ int LineAssembler::getOperandInt(OperandType op_type, const string& operand) {
 	case RD: case RS: case RT: return getRegInt(operand);
 	case SA:  return stoi(operand);
 	case IMM:
-
 		if (isdigit(operand.at(0)) || operand[0] == '-') {
 			return stoi(operand);
 		}

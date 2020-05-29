@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <QTextStream>
+
 class MemorySimulator;
 class RegisterFilesSimulator;
 class TestExecutor;
@@ -24,8 +25,6 @@ class TestExecutor;
 class Executor {
 
 public:
-
-    friend TestExecutor;
 
 /**
  * @brief Excutes MIPS instruction.
@@ -57,28 +56,7 @@ protected:
     RegisterFilesSimulator* reg;
     uint32_t pc;
     std::vector<std::string> files_record;
-};
-
-
-/**
- * @brief Encapsulates unit tests for <code>Executor</code> class.
- * Friend class of <code>Executor</code> class.
- */
-class TestExecutor {
-
-public:
-
-/**
- * @brief Void constructor for <code>TestExecutor</code> class.
- */
-
-    TestExecutor(){};
-
-/**
- * @brief Unit tests for <code>Executor</code> class.
- */
-
-    void testExecutor();
+    bool exit;
 };
 
 #endif // EXECUTOR_H

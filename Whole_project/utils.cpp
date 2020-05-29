@@ -1,3 +1,8 @@
+/**
+ * @file utils.cpp
+ * @brief This file implements utils.h.
+ */
+
 #include "utils.h"
 #include "assembler.h"
 #include <iostream>
@@ -5,9 +10,7 @@
 #include <regex>
 #include <iomanip>
 #include <bitset>
-
 using namespace std;
-
 
 QStringList textseg_to_Qstring(std::vector<TextCell> text_seg) {
 	QStringList resultlist;
@@ -18,7 +21,6 @@ QStringList textseg_to_Qstring(std::vector<TextCell> text_seg) {
 	}
 	return resultlist;
 }
-
 
 string fileToString(const ifstream& file) {
 	stringstream buffer;
@@ -72,7 +74,6 @@ string intToBinaryString(int machine_code_int) {
 	return bitset<32>(machine_code_int).to_string();
 }
 
-
 string combineString(vector<string> str) {
 	string combined = str[0] + " ";
 	for (unsigned int i = 1; i < str.size() - 1; i++) {
@@ -88,7 +89,6 @@ void insertConverted(vector<string>& str_vec, unsigned int pos,
 	if (vec_str_vec.size() == 0) {
 		return;
 	}
-	//new_instruction_1, vector<string> new_instruction_2, vector<string> new_instruction_3){
 	if (!vec_str_vec[0].empty()) {
 		string temp_1 = combineString(vec_str_vec[0]);
 		str_vec[pos] = temp_1;
@@ -106,6 +106,4 @@ void convertInstruction(string& instruction, string var_name, unsigned int addre
 	stringstream sstrm;
 	sstrm << std::dec << address;
 	instruction = instruction.substr(0, var_pos) + sstrm.str();
-
 }
-

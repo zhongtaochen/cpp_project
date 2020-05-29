@@ -304,7 +304,7 @@ void MainWindow::to_next_breakpoint() {
 	setAutos();
 	curr_row = *(breakpoints.begin());
 	breakpoints.erase(breakpoints.begin());
-	std::string message = "We are at the " + std::to_string(debugger.breakpointslength() - breakpoints.size()) + "th break point" + "which is the" + std::to_string(curr_row + 1) + "th row";
+	std::string message = "We are at the " + std::to_string(debugger.getNumOfBreakpoints() - breakpoints.size()) + "th break point" + "which is the" + std::to_string(curr_row + 1) + "th row";
 	QMessageBox::about(this, tr("About to_next_breakpoint"), tr(message.c_str()));
 }
 

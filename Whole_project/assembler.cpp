@@ -1,9 +1,15 @@
+/**
+ * @file assembler.cpp
+ * @brief <code>Assembler</code> class implementation.
+ */
+
 #include "assembler.h"
 #include "lineassembler.h"
 #include "sstream"
 #include "utils.h"
 #include <iostream>
 using namespace std;
+
 Assembler::Assembler(ifstream& asm_file) {
 	Assembler(fileToString(asm_file));
 }
@@ -11,6 +17,7 @@ Assembler::Assembler(ifstream& asm_file) {
 Assembler::Assembler(const string& asm_code) {
 	assemble(asm_code);
 }
+
 void Assembler::assemble(std::ifstream& asm_file) {
 	assemble(fileToString(asm_file));
 }
@@ -34,12 +41,10 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
 	obj_file.data_size = 0;
 	preprocess(asm_data_sec);
 	for (string line : asm_lines) {
-		//        cout << intToHexString(obj_file.data_size) << endl;
 		vector<string> tokens = split(line, "[ \t]+");
 		string type = tokens.at(1);
 		string data_name = line.substr(0, line.find(":"));
 		obj_file.symbol_table.insert({ "*" + data_name,obj_file.data_size });
-
 		if (type == ".asciiz" || type == ".ascii") {
 			string str = line.substr(line.find("\"") + 1, line.rfind("\"") - line.find("\"") - 1);
 			if (type == ".asciiz") {
@@ -133,7 +138,7 @@ void Assembler::handleDataSection(const string& asm_data_sec) {
 			string data = line.substr(line.find(".space") + 6);
 			trim(data);
 			for (int i = 0; i < stoi(data); i++) {
-				obj_file.data_segment.push_back({ obj_file.data_size, 00000000000000000000000000000000 });
+                obj_file.data_segment.push_back({ obj_file.data_size, 0 });
 				obj_file.data_size += 4;
 			}
 		}
@@ -181,7 +186,6 @@ void Assembler::scanLabels() {
 void Assembler::handleTextSection(const string& asm_text_sec) {
 	preprocess(asm_text_sec);
 	scanLabels();
-
 	obj_file.text_size = asm_lines.size() << 2;
 	for (unsigned int i = 0; i < asm_lines.size(); i++) {
 		obj_file.text_segment.push_back({ i << 2, 0, asm_lines.at(i) });
@@ -190,122 +194,105 @@ void Assembler::handleTextSection(const string& asm_text_sec) {
 	}
 }
 
-
-
-void Assembler::output(const string& file_path) {
-	string mc_code = "";
-	for (unsigned int i = 0; i < obj_file.text_segment.size(); i++) {
-		mc_code += intToBinaryString(obj_file.text_segment.at(i).machine_code) + "\n";
-	}
-	writeFile(file_path, mc_code);
-}
-
 void Assembler::pseudoConversion(string asm_line, int i) {
-	vector<string> tokens = split(asm_line, "[ \t,]+");
-	string instruction = tokens.at(0);
-	vector<vector<string>> new_instructions;
-	if (instruction == "mul") {
-		new_instructions.push_back({ "mult", tokens[2], tokens[3] });
-		new_instructions.push_back({ "mflo", tokens[1] });
-	}
-	else if (instruction == "div" && tokens.size() == 4 && tokens[3].find("$") != tokens[3].npos) {
-		new_instructions.push_back({ "div", tokens[2], tokens[3] });
-		new_instructions.push_back({ "mflo", tokens[1] });
-	}
-	else if (instruction == "rem") {
-		new_instructions.push_back({ "div", tokens[2], tokens[3] });
-		new_instructions.push_back({ "mfhi", tokens[1] });
-	}
-	else if (instruction == "move") {
-		new_instructions.push_back({ "or", tokens[1], tokens[2], "$zero" });
-	}
-	else if (instruction == "clear") {
-		new_instructions.push_back({ "or", tokens[1], "$zero", "$zero" });
-	}
-	else if (instruction == "li") {
-		stringstream sstrm1;
-		stringstream sstrm2;
-		sstrm1 << std::dec << ((stoi(tokens[2]) & 0xffff0000) >> 16);
-		sstrm2 << std::dec << (stoi(tokens[2]) & 0x0000ffff);
-		new_instructions.push_back({ "lui", tokens[1], sstrm1.str() });
-		new_instructions.push_back({ "ori", tokens[1], tokens[1], sstrm2.str() });
-	}
-	else if (instruction == "la") {
-		new_instructions.push_back({ "lui", tokens[1],tokens[2] });
-		new_instructions.push_back({ "ori", tokens[1], tokens[1], tokens[2] });
-	}
-	else if (instruction == "b") {
-		new_instructions.push_back({ "beq", "$zero", "$zero", tokens[1] });
-	}
-	else if (instruction == "bal") {
-		new_instructions.push_back({ "bgezal", "$zero", tokens[1] });
-	}
-	else if (instruction == "bgt") {
-		new_instructions.push_back({ "slt", "$at", tokens[2], tokens[1] });
-		new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
-	}
-	else if (instruction == "blt") {
-		new_instructions.push_back({ "slt", "$at", tokens[1], tokens[2] });
-		new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
-	}
-	else if (instruction == "bge") {
-		new_instructions.push_back({ "slt", "$at", tokens[1], tokens[2] });
-		new_instructions.push_back({ "beq", "$at", "$zero", tokens[3] });
-	}
-	else if (instruction == "ble") {
-		new_instructions.push_back({ "slt", "$at", tokens[2], tokens[1] });
-		new_instructions.push_back({ "beq", "$at", "$zero", tokens[3] });
-	}
-	else if (instruction == "bgtu") {
-		new_instructions.push_back({ "sltu", "$at", tokens[2], tokens[1] });
-		new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
-	}
-	else if (instruction == "beqz") {
-		new_instructions.push_back({ "beq", tokens[1], "$zero", tokens[2] });
-	}
-	else if (instruction == "beq" && tokens[2].find("$") == tokens[2].npos) {
-		stringstream sstrm1;
-		stringstream sstrm2;
-		sstrm1 << std::dec << ((stoi(tokens[2]) & 0xffff0000) >> 16);
-		sstrm2 << std::dec << (stoi(tokens[2]) & 0x0000ffff);
-		new_instructions.push_back({ "lui", "at", sstrm1.str() });
-		new_instructions.push_back({ "ori", "$at", "$zero", sstrm2.str() });
-		new_instructions.push_back({ "beq", tokens[1], "$at", tokens[3] });
-	}
-	else if (instruction == "bne" && tokens[2].find("$") == tokens[2].npos) {
-		stringstream sstrm1;
-		stringstream sstrm2;
-		sstrm1 << std::dec << ((stoi(tokens[2]) & 0xffff0000) >> 16);
-		sstrm2 << std::dec << (stoi(tokens[2]) & 0x0000ffff);
-		new_instructions.push_back({ "lui", "at", sstrm1.str() });
-		new_instructions.push_back({ "ori", "$at", "$zero", sstrm2.str() });
-		new_instructions.push_back({ "bne", tokens[1], "$at", tokens[3] });
-	}
-	else if (instruction == "not") {
-		new_instructions.push_back({ "nor", tokens[1], tokens[2], "$zero" });
-	}
-	else if (instruction == "nop") {
-		new_instructions.push_back({ "sll", "$zero", "$zero", "0" });
-	}
-	else if (instruction == "abs") {
-		new_instructions.push_back({ "sra", "$at", tokens[2], "31" });
-		new_instructions.push_back({ "xor", tokens[1], tokens[2], "$at" });
-		new_instructions.push_back({ "subu", tokens[1], tokens[1], "$at" });
-	}
-	else if (instruction == "mulou") {
-		new_instructions.push_back({ "multu", tokens[2], tokens[3] });
-		new_instructions.push_back({ "mflo", tokens[1] });
-	}
-	else if (instruction == "remu") {
-		new_instructions.push_back({ "divu", tokens[2], tokens[3] });
-		new_instructions.push_back({ "mfhi", tokens[1] });
-	}
-	insertConverted(asm_lines, i, new_instructions);
+    vector<string> tokens = split(asm_line, "[ \t,]+");
+    string instruction = tokens.at(0);
+    vector<vector<string>> new_instructions;
+    if (instruction == "abs") {
+        new_instructions.push_back({ "sra", "$at", tokens[2], "31" });
+        new_instructions.push_back({ "xor", tokens[1], tokens[2], "$at" });
+        new_instructions.push_back({ "subu", tokens[1], tokens[1], "$at" });
+    }
+    else if (instruction == "b") {
+        new_instructions.push_back({ "beq", "$zero", "$zero", tokens[1] });
+    }
+    else if (instruction == "bal") {
+        new_instructions.push_back({ "bgezal", "$zero", tokens[1] });
+    }
+    else if (instruction == "beq" && tokens[2].find("$") == tokens[2].npos) {
+        stringstream sstrm1;
+        stringstream sstrm2;
+        sstrm1 << std::dec << ((stoi(tokens[2])&0xffff0000)>>16);
+        sstrm2 << std::dec << (stoi(tokens[2]) & 0x0000ffff);
+        new_instructions.push_back({ "lui", "$at", sstrm1.str()});
+        new_instructions.push_back({ "ori", "$at", "$at", sstrm2.str() });
+        new_instructions.push_back({ "beq", tokens[1], "$at", tokens[3] });
+    }
+    else if (instruction == "beqz") {
+        new_instructions.push_back({ "beq", tokens[1], "$zero", tokens[2] });
+    }
+    else if (instruction == "bge") {
+        new_instructions.push_back({ "slt", "$at", tokens[1], tokens[2] });
+        new_instructions.push_back({ "beq", "$at", "$zero", tokens[3] });
+    }
+    else if (instruction == "bgt") {
+        new_instructions.push_back({ "slt", "$at", tokens[2], tokens[1] });
+        new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
+    }
+    else if (instruction == "bgtu") {
+        new_instructions.push_back({ "sltu", "$at", tokens[2], tokens[1] });
+        new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
+    }
+    else if (instruction == "ble") {
+        new_instructions.push_back({ "slt", "$at", tokens[2], tokens[1] });
+        new_instructions.push_back({ "beq", "$at", "$zero", tokens[3] });
+    }
+    else if (instruction == "blt") {
+        new_instructions.push_back({ "slt", "$at", tokens[1], tokens[2] });
+        new_instructions.push_back({ "bne", "$at", "$zero", tokens[3] });
+    }
+    else if (instruction == "bne" && tokens[2].find("$") == tokens[2].npos) {
+        stringstream sstrm1;
+        stringstream sstrm2;
+        sstrm1 << std::dec << ((stoi(tokens[2])&0xffff0000)>>16);
+        sstrm2 << std::dec << (stoi(tokens[2]) & 0x0000ffff);
+        new_instructions.push_back({ "lui", "$at", sstrm1.str()});
+        new_instructions.push_back({ "ori", "$at", "$at", sstrm2.str() });
+        new_instructions.push_back({ "bne", tokens[1], "$at", tokens[3] });
+    }
+    else if (instruction == "clear") {
+        new_instructions.push_back({ "or", tokens[1], "$zero", "$zero" });
+    }
+    else if (instruction == "div" && tokens.size() == 4 && tokens[3].find("$") != tokens[3].npos) {
+        new_instructions.push_back({ "div", tokens[2], tokens[3] });
+        new_instructions.push_back({ "mflo", tokens[1] });
+    }
+    else if (instruction == "la") {
+        new_instructions.push_back({ "lui", tokens[1],tokens[2]});
+        new_instructions.push_back({ "ori", tokens[1], tokens[1], tokens[2]});
+    }
+    else if (instruction == "li") {
+        stringstream sstrm1;
+        stringstream sstrm2;
+        sstrm1 << std::dec << ((stoi(tokens[2])&0xffff0000)>>16);
+        sstrm2 << std::dec << (stoi(tokens[2]) & 0x0000ffff);
+        new_instructions.push_back({ "lui", tokens[1], sstrm1.str()});
+        new_instructions.push_back({ "ori", tokens[1], tokens[1], sstrm2.str() });
+    }
+    else if (instruction == "move") {
+        new_instructions.push_back({ "or", tokens[1], tokens[2], "$zero" });
+    }
+    else if (instruction == "mul") {
+        new_instructions.push_back({ "mult", tokens[2], tokens[3] });
+        new_instructions.push_back({ "mflo", tokens[1] });
+    }
+    else if (instruction == "mulou") {
+        new_instructions.push_back({ "multu", tokens[2], tokens[3] });
+        new_instructions.push_back({ "mflo", tokens[1] });
+    }
+    else if (instruction == "nop") {
+        new_instructions.push_back({ "sll", "$zero", "$zero", "0" });
+    }
+    else if (instruction == "not") {
+        new_instructions.push_back({ "nor", tokens[1], tokens[2], "$zero" });
+    }
+    else if (instruction == "rem") {
+        new_instructions.push_back({ "div", tokens[2], tokens[3] });
+        new_instructions.push_back({ "mfhi", tokens[1] });
+    }
+    else if (instruction == "remu") {
+        new_instructions.push_back({ "divu", tokens[2], tokens[3] });
+        new_instructions.push_back({ "mfhi", tokens[1] });
+    }
+    insertConverted(asm_lines, i, new_instructions);
 }
-
-
-
-
-
-
-

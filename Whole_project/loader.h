@@ -19,9 +19,9 @@ class Loader {
 public:
 
 /**
- * @brief Constructor for <code>Loader</code> class.
- * @param exe_file program to be loaded.
+ * @brief Initializer for <code>Loader</code> class.
  */
+
     Loader(){};
     Loader(ExecutableFile* exe_file);
 
@@ -29,16 +29,17 @@ public:
  * @brief Load exe_file program
  * @param exe_file program to be loaded.
  */
+
     void load(ExecutableFile* exe_file);
 
 /**
- * @brief Returns loaded memory simulator.
+ * @brief Return loaded memory simulator.
  */
 
     MemorySimulator* getMemorySimulator();
 
 /**
- * @brief Returns initilized register files simulator.
+ * @brief Return initilized register files simulator.
  */
 
     RegisterFilesSimulator* getRegisterFilesSimulator();

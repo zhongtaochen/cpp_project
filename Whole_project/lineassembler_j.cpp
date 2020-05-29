@@ -1,3 +1,8 @@
+/**
+ * @file lineassembler_j.cpp
+ * @brief <code>J_LineAssembler</code> class implementation.
+ */
+
 #include "lineassembler.h"
 #include "utils.h"
 using namespace std;
