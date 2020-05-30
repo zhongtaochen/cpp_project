@@ -19,7 +19,6 @@ SOURCES += \
     assembler.cpp \
     codeEditor.cpp \
     debugger.cpp \
-    debugger_test.cpp \
     executor.cpp \
     finddialog.cpp \
     highlighter.cpp \
@@ -30,11 +29,9 @@ SOURCES += \
     lineassembler_r.cpp \
     linker.cpp \
     loader.cpp \
-    loader_test.cpp \
     main.cpp \
     mainwindow.cpp \
     simulator.cpp \
-    simulator_test.cpp \
     treeView.cpp \
     utils.cpp
 
